@@ -2,6 +2,7 @@
   "name": "live-photo",
   "version": "0.0.1",
   "description": "A LivePhoto viewer for web applications",
+  "author": "Icey Wu <3128006406@qq.com>",
   "main": "dist/LivePhotoViewer.js",
   "types": "dist/LivePhotoViewer.d.ts",
   "files": [
@@ -13,7 +14,15 @@
     "release": "changelogen --release && npm publish --registry https://registry.npmjs.org"
   },
   "keywords": ["livephoto", "viewer"],
-  "author": "Your Name",
+  "funding": "https://github.com/sponsors/live-photo",
+  "homepage": "https://github.com/live-photo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/live-photo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/live-photo/issues"
+  },
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.3",

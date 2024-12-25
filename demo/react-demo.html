@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React LivePhoto Viewer Demo</title>
+    <script src="../dist/LivePhotoViewer.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="react-demo"></div>
+    <script type="text/babel">
+      const { useEffect, useRef } = React;
+
+      const ReactDemo = () => {
+        const demoSource = {
+          photoSrc: "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+          videoSrc: "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
+        };
+        const containerRef = useRef(null);
+
+        useEffect(() => {
+          new LivePhotoViewer({
+            photoSrc: demoSource.photoSrc,
+            videoSrc: demoSource.videoSrc,
+            container: containerRef.current,
+            width: 300,
+            height: 300,
+          });
+        }, []);
+
+        return <div ref={containerRef}></div>;
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('react-demo'));
+      root.render(<ReactDemo />);
+    </script>
+  </body>
+</html> 
