@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LivePhoto Viewer Test</title>
+    <script src="../dist/LivePhotoViewer.js"></script>
+  </head>
+  <body>
+    <div id="live-photo-container"></div>
+    <script>
+      const demoSource = {
+        photoSrc:
+          "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+        videoSrc:
+          "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
+      };
+      document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById("live-photo-container");
+        new LivePhotoViewer({
+          photoSrc: demoSource.photoSrc,
+          videoSrc: demoSource.videoSrc,
+          container: container,
+          width: 300,
+          height: 300,
+        });
+      });
+    </script>
+  </body>
+</html>
