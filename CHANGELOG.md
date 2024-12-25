@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.3
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.2...v0.0.3)
+
+### 📖 Documentation
+
+- 更新 README，修改示例链接并调整组件名称 ([dd896bc](https://github.com/iceywu/live-photo/commit/dd896bc))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.2
 
 
