@@ -15,16 +15,23 @@
   },
   "keywords": [
     "livephoto",
-    "viewer"
+    "image",
+    "viewer",
+    "web",
+    "javascript",
+    "typescript" ,
+    "vue",
+    "react",
+    "angular"
   ],
-  "funding": "https://github.com/sponsors/live-photo",
-  "homepage": "https://github.com/live-photo#readme",
+  "funding": "https://github.com/sponsors/iceywu",
+  "homepage": "https://github.com/iceywu/live-photo#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/live-photo.git"
+    "url": "git+https://github.com/iceywu/live-photo.git"
   },
   "bugs": {
-    "url": "https://github.com/live-photo/issues"
+    "url": "https://github.com/iceywu/live-photo/issues"
   },
   "license": "MIT",
   "devDependencies": {

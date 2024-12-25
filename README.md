@@ -1,4 +1,4 @@
-# LivePhoto Viewer
+# live-photo
 
 一个简单易用的 Apple Live Photo 网页查看器组件。让您能够在网页上展示类似 iOS 实时照片的效果。
 
@@ -44,13 +44,13 @@ bun i live-photo
 ### 原生 JavaScript 示例
 
 ```html
-<script src="path/to/LivePhotoViewer.js"></script>
+<script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
 <div id="live-photo-container"></div>
 
 <script>
   new LivePhotoViewer({
-    photoSrc: "path/to/photo.jpg",
-    videoSrc: "path/to/video.mov",
+    photoSrc: "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+    videoSrc: "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
     container: document.getElementById("live-photo-container"),
     width: 300,
     height: 300,
@@ -70,7 +70,7 @@ import { ref, onMounted } from "vue";
 import { LivePhotoViewer } from "live-photo";
 const demoSource = {
   photoSrc:
-    "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
   videoSrc:
     "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
 };
@@ -100,7 +100,7 @@ import { LivePhotoViewer } from "live-photo";
 const ReactDemo: React.FC = () => {
   const demoSource = {
     photoSrc:
-      "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+      "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
     videoSrc:
       "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
   };
