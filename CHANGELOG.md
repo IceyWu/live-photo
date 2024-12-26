@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.4
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.3...v0.0.4)
+
+### 🚀 Enhancements
+
+- 更新 LivePhotoViewer 组件样式和功能，添加交互式徽章和下拉菜单 ([2a974e8](https://github.com/iceywu/live-photo/commit/2a974e8))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.3
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.2...v0.0.3)
