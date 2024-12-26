@@ -74,28 +74,25 @@ export class LivePhotoViewer {
     this.badge.appendChild(spanChevron);
 
     this.badge.style.transition = "width 0.3s";
-    this.badge.addEventListener("mouseenter", () => {
-    });
-    this.badge.addEventListener("mouseleave", () => {
-      // 删除控制按钮
-      const controlButton = document.querySelector(".dropdown-menu");
-      controlButton?.remove();
-    });
 
     this.badge.addEventListener("click", () => {
-      const controlButton = document.createElement("div");
-      controlButton.className = "dropdown-menu";
-      controlButton.innerHTML = `
+      const hasControlButton = document.querySelector(".dropdown-menu");
+      if (hasControlButton) {
+        hasControlButton?.remove();
+      } else {
+        const controlButton = document.createElement("div");
+        controlButton.className = "dropdown-menu";
+        controlButton.innerHTML = `
         <button id="toggle-autoplay">开启自动播放</button>
       `;
-      this.container.appendChild(controlButton);
+        this.container.appendChild(controlButton);
 
-      document
-        .getElementById("toggle-autoplay")
-        ?.addEventListener("click", () => {
-          this.play();
-          controlButton.remove();
-        });
+        document
+          .getElementById("toggle-autoplay")
+          ?.addEventListener("click", () => {
+            console.log("🌈-----click-----");
+          });
+      }
     });
 
     this.container.appendChild(this.photo);
@@ -109,7 +106,11 @@ export class LivePhotoViewer {
 
   private init(): void {
     this.badge.addEventListener("mouseenter", () => this.play());
-    this.badge.addEventListener("mouseleave", () => this.stop());
+    this.badge.addEventListener("mouseleave", () => {
+      this.stop();
+      const controlButton = document.querySelector(".dropdown-menu");
+      controlButton?.remove();
+    });
   }
 
   public play(): void {
