@@ -1,6 +1,24 @@
 # Changelog
 
 
+## v0.0.42
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.4...v0.0.42)
+
+### 🚀 Enhancements
+
+- 添加自动播放功能和事件回调，优化 LivePhotoViewer 组件交互 ([005e76a](https://github.com/iceywu/live-photo/commit/005e76a))
+- 添加图标支持，优化 LivePhotoViewer 组件的状态显示和交互 ([c541e5b](https://github.com/iceywu/live-photo/commit/c541e5b))
+- 更新图标尺寸，添加中文 README 文件，优化英文 README 内容 ([69ae87b](https://github.com/iceywu/live-photo/commit/69ae87b))
+
+### 🩹 Fixes
+
+- 修复dom重复添加 ([a748c89](https://github.com/iceywu/live-photo/commit/a748c89))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.4
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.3...v0.0.4)

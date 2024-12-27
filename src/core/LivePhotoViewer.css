@@ -37,6 +37,7 @@
   box-sizing: border-box;
   padding: 0 2px;
   transition: width 0.3s;
+  caret-color: transparent;
 }
 
 .live-photo-badge .live-icon {

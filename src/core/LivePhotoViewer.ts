@@ -25,7 +25,7 @@ export class LivePhotoViewer {
   private videoError: boolean = false;
 
   constructor(options: LivePhotoOptions) {
-    this.autoplay = options.autoplay || false;
+    this.autoplay = options.autoplay || true;
     this.container = this.createContainer(options);
     this.photo = this.createPhoto(options);
     this.video = this.createVideo(options);
