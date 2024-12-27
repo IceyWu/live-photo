@@ -85,6 +85,7 @@ export class LivePhotoViewer {
       video.style.display = "none";
       this.videoError = true;
       this.badge.innerHTML = errorIcon;
+      this.container.classList.remove("playing");
       if (options.onError) options.onError(new Error("Video load error"));
     });
     return video;
@@ -120,19 +121,25 @@ export class LivePhotoViewer {
       controlButton.innerHTML = `<button id="toggle-autoplay">开启自动播放</button>`;
       this.container.appendChild(controlButton);
 
-      document.getElementById("toggle-autoplay")?.addEventListener("click", () => {
-        this.autoplay = !this.autoplay;
-        const button = document.getElementById("toggle-autoplay");
-        if (button) {
-          button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
-          this.badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
-        }
-        if (this.autoplay) {
-          this.play();
-        } else {
-          this.stop();
-        }
-      });
+      document
+        .getElementById("toggle-autoplay")
+        ?.addEventListener("click", () => {
+          this.autoplay = !this.autoplay;
+          const button = document.getElementById("toggle-autoplay");
+          if (button) {
+            button.textContent = this.autoplay
+              ? "关闭自动播放"
+              : "开启自动播放";
+            this.badge.innerHTML = this.autoplay
+              ? liveIcon
+              : liveIconNoAutoPlay;
+          }
+          if (this.autoplay) {
+            this.play();
+          } else {
+            this.stop();
+          }
+        });
     }
   }
 
