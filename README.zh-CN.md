@@ -1,22 +1,22 @@
 <h1 align="center">live-photo</h1>
-<p align="center">🚀A simple and easy-to-use Live Photo web viewer component that allows you to display effects similar to iOS Live Photos on the web. </p>
+<p align="center">🚀一个简单易用的 Live Photo 网页查看器组件。让您能够在网页上展示类似 iOS 实时照片的效果。 </p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img src="https://img.shields.io/npm/v/live-photo?color=a1b858&label=" alt="NPM version"></a>
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/live-photo?color=50a36f&label="></a>
 </p>
 
-**Eenglish** | [中文](./README.zh-CN.md)
+**中文** | [English](./README.md)
 
-## ✨ Features
+## ✨ 特性
 
-- 🎯 Zero dependencies, lightweight implementation
-<!-- - 📱 Supports both mobile and desktop -->
-- 🖼️ Seamless switching between images and videos
-- 🎨 Customizable sizes and styles
-- 🚀 Easy-to-use API
+- 🎯 零依赖，轻量级实现
+<!-- - 📱 支持移动端和桌面端 -->
+- 🖼️ 支持图片和视频无缝切换
+- 🎨 可自定义尺寸和样式
+- 🚀 简单易用的 API
 
-## 📦 Installation
+## 📦 安装
 
 ```bash
 npm install live-photo
@@ -30,41 +30,41 @@ bun i live-photo
 
 ## 📖 API
 
-### Configuration Options
+### 配置选项
 
-| Parameter  | Type        | Required | Description                |
-|------------|-------------|----------|----------------------------|
-| photoSrc   | string      | Yes      | Image resource URL         |
-| videoSrc   | string      | Yes      | Video resource URL         |
-| container  | HTMLElement | Yes      | Container DOM element      |
-| width      | number      | No       | Viewer width (default: 300px) |
-| height     | number      | No       | Viewer height (default: 300px) |
-| autoplay   | boolean     | No       | Whether to autoplay (default: false) |
-| onCanPlay  | () => void  | No       | Callback when video can play |
-| onError    | (e?: any) => void | No | Callback on load error     |
-| onEnded    | () => void  | No       | Callback when video ends    |
-| onVideoLoad| () => void  | No       | Callback when video loads   |
-| onPhotoLoad| () => void  | No       | Callback when image loads    |
+| 参数      | 类型        | 必填 | 描述                    |
+| --------- | ----------- | ---- | ----------------------- |
+| photoSrc  | string      | 是   | 图片资源地址            |
+| videoSrc  | string      | 是   | 视频资源地址            |
+| container | HTMLElement | 是   | 容器 DOM 元素           |
+| width     | number      | 否   | 查看器宽度(默认: 300px) |
+| height    | number      | 否   | 查看器高度(默认: 300px) |
+| autoplay  | boolean     | 否   | 是否自动播放(默认: false) |
+| onCanPlay | () => void  | 否   | 视频可以播放时的回调    |
+| onError   | (e?: any) => void | 否 | 加载错误时的回调        |
+| onEnded   | () => void  | 否   | 视频播放结束时的回调    |
+| onVideoLoad | () => void | 否  | 视频加载完成时的回调    |
+| onPhotoLoad | () => void | 否  | 图片加载完成时的回调    |
 
-### Methods
+### 抛出方法
 
-| Method | Description                  |
-|--------|------------------------------|
-| play   | Start playing the video      |
-| pause  | Pause the video              |
-| toggle | Toggle play and pause state  |
-| stop   | Stop the video and reset time|
+| 方法   | 描述                     |
+| ------ | ------------------------ |
+| play   | 开始播放视频             |
+| pause  | 暂停播放视频             |
+| toggle | 切换播放和暂停状态       |
+| stop   | 停止播放视频并重置时间   |
 
-## 🔧 Development Environment
+## 🔧 开发环境
 
 - Bun
-- Modern browser support
+- 现代浏览器支持
 
-## 📚 Usage Example
+## 📚 使用示例
 
-### Native JavaScript Example
+### 原生 JavaScript 示例
 
-[View HTML example code](./demo/html-demo.html)
+[查看 HTML 示例代码](./demo/html-demo.html)
 
 ```html
 <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
@@ -88,9 +88,9 @@ bun i live-photo
 </script>
 ```
 
-### Vue 3 Example (TypeScript, Composition API)
+### Vue 3 示例 (TypeScript, 组合式 API)
 
-[View Vue 3 example code](./demo/vue3-demo.html)
+[查看 Vue 3 示例代码](./demo/vue3-demo.html)
 
 ```typescript
 <template>
@@ -120,11 +120,12 @@ onMounted(() => {
   }
 });
 </script>
+
 ```
 
-### React Example (TypeScript)
+### React 示例 (TypeScript)
 
-[View React example code](./demo/react-demo.html)
+[查看 React 示例代码](./demo/react-demo.html)
 
 ```typescript
 import React, { useEffect, useRef } from "react";
