@@ -1,4 +1,5 @@
 import "./LivePhotoViewer.css";
+import { liveIcon, liveIconNoAutoPlay, arrowIcon, errorIcon } from "./icons";
 
 export interface LivePhotoOptions {
   photoSrc: string;
@@ -33,6 +34,7 @@ export class LivePhotoViewer {
         const button = document.getElementById("toggle-autoplay");
         if (button) {
           button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
+          this.badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
         }
         if (this.autoplay) {
           this.play();
@@ -82,40 +84,15 @@ export class LivePhotoViewer {
     this.video.addEventListener("error", () => {
       this.video.style.display = "none"; // 隐藏视频
       this.videoError = true; // 设置视频加载错误状态
-      this.badge.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-linejoin="round" d="m3.5 3.5l9 9m2-4.5a6.5 6.5 0 1 1-13 0a6.5 6.5 0 0 1 13 0Z"/></svg>
-      `;
+      this.badge.innerHTML = errorIcon;
       if (options.onError) options.onError(new Error("Video load error"));
     });
 
     this.badge = document.createElement("div");
     this.badge.className = "live-photo-badge";
 
-    this.badge.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="live-icon">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
-        <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" />
-        <path d="M15.9 20.11l0 .01" />
-        <path d="M19.04 17.61l0 .01" />
-        <path d="M20.77 14l0 .01" />
-        <path d="M20.77 10l0 .01" />
-        <path d="M19.04 6.39l0 .01" />
-        <path d="M15.9 3.89l0 .01" />
-        <path d="M12 3l0 .01" />
-        <path d="M8.1 3.89l0 .01" />
-        <path d="M4.96 6.39l0 .01" />
-        <path d="M3.23 10l0 .01" />
-        <path d="M3.23 14l0 .01" />
-        <path d="M4.96 17.61l0 .01" />
-        <path d="M8.1 20.11l0 .01" />
-        <path d="M12 21l0 .01" />
-      </svg>
-    `;
+    this.badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
 
-    const arrowIcon = `
-   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32"><path fill="currentColor" d="M16 22L6 12l1.4-1.4l8.6 8.6l8.6-8.6L26 12z"/></svg>
-  `;
     const span = document.createElement("span");
     const spanChevron = document.createElement("span");
     // 类名
@@ -190,7 +167,22 @@ export class LivePhotoViewer {
     if (this.isPlaying) {
       this.isPlaying = false;
       this.video.pause();
+      this.video.currentTime = 0;
       this.container.classList.remove("playing");
+    }
+  }
+  public pause(): void {
+    if (this.isPlaying) {
+      this.isPlaying = false;
+      this.video.pause();
+      this.container.classList.remove("playing");
+    }
+  }
+  public toggle(): void {
+    if (this.isPlaying) {
+      this.pause();
+    } else {
+      this.play();
     }
   }
 }
