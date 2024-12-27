@@ -69,25 +69,41 @@
   opacity: 1;
   width: 24px;
 }
+.live-photo-badge:hover::after {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 24px;
+  bottom: 0;
+  right: auto;
+  height: 40px;
+  width: 200%;
+  background-color: none;
+  z-index: 10;
+}
 
 .dropdown-menu {
+  display: none; /* 默认隐藏 */
   position: absolute;
   top: 50px;
   left: 16px;
- 
+
   padding: 5px;
   color: #fff;
-  
+
   -webkit-backdrop-filter: saturate(150%) blur(10px);
   backdrop-filter: saturate(150%) blur(10px);
   background: rgba(64, 64, 64, 0.25);
   border-radius: 12px;
   color: #fff;
   cursor: pointer;
+  /* z-index: 10; */
+}
+.dropdown-menu.show {
+  display: block;
 }
 
 .dropdown-menu button {
- 
   color: #fff;
   border: none;
   border-radius: 4px;

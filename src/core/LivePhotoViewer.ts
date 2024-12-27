@@ -6,6 +6,12 @@ export interface LivePhotoOptions {
   container: HTMLElement;
   width?: number;
   height?: number;
+  autoplay?: boolean; // 新增自动播放参数
+  onCanPlay?: () => void; // 新增事件回调
+  onError?: (e?: any) => void; // 新增事件回调
+  onEnded?: () => void; // 新增事件回调
+  onVideoLoad?: () => void; // 新增事件回调
+  onPhotoLoad?: () => void; // 新增事件回调
 }
 
 export class LivePhotoViewer {
@@ -14,8 +20,26 @@ export class LivePhotoViewer {
   private container: HTMLElement;
   private badge: HTMLDivElement;
   private isPlaying: boolean = false;
+  private autoplay: boolean = false;
+  private videoError: boolean = false; // 新增视频加载错误状态
 
   constructor(options: LivePhotoOptions) {
+    this.autoplay = options.autoplay || false; // 初始化自动播放状态
+
+    document
+      .getElementById("toggle-autoplay")
+      ?.addEventListener("click", () => {
+        this.autoplay = !this.autoplay;
+        const button = document.getElementById("toggle-autoplay");
+        if (button) {
+          button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
+        }
+        if (this.autoplay) {
+          this.play();
+        } else {
+          this.stop();
+        }
+      });
     this.container = document.createElement("div");
     this.container.className = "live-photo-container";
     this.container.style.width = `${options.width || 300}px`;
@@ -28,12 +52,41 @@ export class LivePhotoViewer {
     this.photo = new Image();
     this.photo.src = options.photoSrc;
     this.photo.className = "live-photo-image";
+    this.photo.addEventListener("load", () => {
+      if (options.onPhotoLoad) options.onPhotoLoad();
+    });
+    this.photo.addEventListener("error", () => {
+      if (options.onError) options.onError(new Error("Photo load error"));
+    });
 
     this.video = document.createElement("video");
     this.video.src = options.videoSrc;
-    this.video.loop = true;
+    this.video.loop = false;
     this.video.muted = true;
     this.video.className = "live-photo-video";
+    this.video.addEventListener("canplay", () => {
+      if (options.onCanPlay) options.onCanPlay();
+    });
+    this.video.addEventListener("ended", () => {
+      if (!this.video.loop) {
+        this.stop();
+        this.isPlaying = false;
+        this.container.classList.remove("playing");
+        this.autoplay = false;
+        if (options.onEnded) options.onEnded();
+      }
+    });
+    this.video.addEventListener("loadeddata", () => {
+      if (options.onVideoLoad) options.onVideoLoad();
+    });
+    this.video.addEventListener("error", () => {
+      this.video.style.display = "none"; // 隐藏视频
+      this.videoError = true; // 设置视频加载错误状态
+      this.badge.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-linejoin="round" d="m3.5 3.5l9 9m2-4.5a6.5 6.5 0 1 1-13 0a6.5 6.5 0 0 1 13 0Z"/></svg>
+      `;
+      if (options.onError) options.onError(new Error("Video load error"));
+    });
 
     this.badge = document.createElement("div");
     this.badge.className = "live-photo-badge";
@@ -105,16 +158,27 @@ export class LivePhotoViewer {
   }
 
   private init(): void {
-    this.badge.addEventListener("mouseenter", () => this.play());
+    if (this.autoplay) {
+      this.play();
+    }
+
+    this.badge.addEventListener("mouseenter", () => {
+      if (!this.autoplay && !this.videoError) {
+        this.play();
+      }
+    });
+
     this.badge.addEventListener("mouseleave", () => {
-      this.stop();
+      if (!this.autoplay && !this.videoError) {
+        this.stop();
+      }
       const controlButton = document.querySelector(".dropdown-menu");
       controlButton?.remove();
     });
   }
 
   public play(): void {
-    if (!this.isPlaying) {
+    if (!this.isPlaying && !this.videoError) {
       this.isPlaying = true;
       this.video.currentTime = 0;
       this.video.play();
