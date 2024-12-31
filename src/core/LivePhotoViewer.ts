@@ -23,9 +23,10 @@ export class LivePhotoViewer {
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
+  private touchTimeout: number | undefined;
 
   constructor(options: LivePhotoOptions) {
-    this.autoplay = options.autoplay || true;
+    this.autoplay = options.autoplay ?? true;
     this.container = this.createContainer(options);
     this.photo = this.createPhoto(options);
     this.video = this.createVideo(options);
@@ -35,6 +36,8 @@ export class LivePhotoViewer {
     this.container.appendChild(this.video);
     this.container.appendChild(this.badge);
     options.container.appendChild(this.container);
+
+    this.touchTimeout = undefined;
 
     this.init(options);
   }
@@ -143,24 +146,53 @@ export class LivePhotoViewer {
     }
   }
 
+  private isMobile(): boolean {
+    return /Mobi|Android/i.test(navigator.userAgent);
+  }
+
+  private handleTouchStart(): void {
+    this.touchTimeout = setTimeout(() => {
+      if (!this.autoplay && !this.videoError) {
+        this.play();
+      }
+    }, 500); // 长按 500ms
+  }
+
+  private handleTouchEnd(): void {
+    clearTimeout(this.touchTimeout);
+    if (!this.autoplay && !this.videoError) {
+      this.stop();
+    }
+    const controlButton = document.querySelector(".dropdown-menu");
+    controlButton?.remove();
+  }
+
   private init(options: LivePhotoOptions): void {
     if (this.autoplay) {
       this.play();
     }
 
-    this.badge.addEventListener("mouseenter", () => {
-      if (!this.autoplay && !this.videoError) {
-        this.play();
-      }
-    });
+    if (this.isMobile()) {
+      this.container.addEventListener(
+        "touchstart",
+        this.handleTouchStart.bind(this)
+      );
+      this.container.addEventListener("touchend", this.handleTouchEnd.bind(this));
+    } else {
+      this.badge.addEventListener("mouseenter", () => {
+        if (!this.autoplay && !this.videoError) {
+          this.play();
+        }
+      });
 
-    this.badge.addEventListener("mouseleave", () => {
-      if (!this.autoplay && !this.videoError) {
-        this.stop();
-      }
-      const controlButton = document.querySelector(".dropdown-menu");
-      controlButton?.remove();
-    });
+      this.badge.addEventListener("mouseleave", () => {
+        if (!this.autoplay && !this.videoError) {
+          this.stop();
+        }
+        const controlButton = document.querySelector(".dropdown-menu");
+        controlButton?.remove();
+      });
+    }
   }
 
   public play(): void {
@@ -168,7 +200,15 @@ export class LivePhotoViewer {
       this.isPlaying = true;
       this.video.currentTime = 0;
       this.video.play();
-      this.container.classList.add("playing");
+
+      if (navigator.vibrate) {
+        navigator.vibrate(200); // 震动 200ms
+      }
+
+      requestAnimationFrame(() => {
+        this.container.classList.add("playing");
+        this.photo.style.opacity = "0";
+      });
     }
   }
 
@@ -194,6 +234,7 @@ export class LivePhotoViewer {
       this.video.pause();
       this.video.currentTime = 0;
       this.container.classList.remove("playing");
+      this.photo.style.opacity = "1";
     }
   }
 }
