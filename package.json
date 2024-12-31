@@ -1,6 +1,6 @@
 {
   "name": "live-photo",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "description": "A LivePhoto viewer for web applications",
   "author": "Icey Wu <3128006406@qq.com>",
   "main": "dist/LivePhotoViewer.js",

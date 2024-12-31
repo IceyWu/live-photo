@@ -1,6 +1,25 @@
 # Changelog
 
 
+## v0.0.43
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.42...v0.0.43)
+
+### 🚀 Enhancements
+
+- 新增playground ([8aaf730](https://github.com/iceywu/live-photo/commit/8aaf730))
+- 优化 LivePhotoViewer 组件的触摸交互，添加触摸事件处理，增强动画效果 ([a6ce36e](https://github.com/iceywu/live-photo/commit/a6ce36e))
+- 更新 LivePhotoViewer 组件，添加触摸事件处理，优化视频播放控制和用户选择行为 ([879e013](https://github.com/iceywu/live-photo/commit/879e013))
+- 添加下拉菜单以控制自动播放功能，优化交互体验 ([cf6b5e1](https://github.com/iceywu/live-photo/commit/cf6b5e1))
+
+### 🏡 Chore
+
+- **release:** V0.0.42 ([ad29ac2](https://github.com/iceywu/live-photo/commit/ad29ac2))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.42
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.4...v0.0.42)
