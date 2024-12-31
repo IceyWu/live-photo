@@ -20,6 +20,7 @@ export class LivePhotoViewer {
   private video: HTMLVideoElement;
   private container: HTMLElement;
   private badge: HTMLDivElement;
+  private dropMenu: HTMLDivElement;
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
@@ -31,10 +32,12 @@ export class LivePhotoViewer {
     this.photo = this.createPhoto(options);
     this.video = this.createVideo(options);
     this.badge = this.createBadge();
+    this.dropMenu = this.createDropMenu();
 
     this.container.appendChild(this.photo);
     this.container.appendChild(this.video);
     this.container.appendChild(this.badge);
+    this.container.appendChild(this.dropMenu);
     options.container.appendChild(this.container);
 
     this.touchTimeout = undefined;
@@ -110,32 +113,33 @@ export class LivePhotoViewer {
 
     return badge;
   }
+  private createDropMenu(): HTMLDivElement {
+    const controlButton = document.createElement("div");
+    controlButton.className = "dropdown-menu";
+    const ctrBtn = document.createElement("button");
+    ctrBtn.id = "toggle-autoplay";
+    ctrBtn.innerHTML = `开启自动播放`;
+    controlButton.append(ctrBtn);
+    ctrBtn?.addEventListener("click", () => {
+      this.autoplay = !this.autoplay;
+      const button = document.getElementById("toggle-autoplay");
+      if (button) {
+        button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
+        this.badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
+        this.badge.innerHTML += `<span class="live-text">LIVE</span><span class="chevron">${arrowIcon}</span>`;
+      }
+      this.autoplay ? this.play() : this.stop();
+      this.toggleAutoplay()
+    });
+
+    return controlButton;
+  }
 
   private toggleAutoplay(): void {
-    const hasControlButton = document.querySelector(".dropdown-menu");
-    if (hasControlButton) {
-      hasControlButton.remove();
+    if (this.dropMenu.classList.contains("show")) {
+      this.dropMenu.classList.remove("show");
     } else {
-      const controlButton = document.createElement("div");
-      controlButton.className = "dropdown-menu";
-      controlButton.innerHTML = `<button id="toggle-autoplay">开启自动播放</button>`;
-      this.container.appendChild(controlButton);
-
-      document
-        .getElementById("toggle-autoplay")
-        ?.addEventListener("click", () => {
-          this.autoplay = !this.autoplay;
-          const button = document.getElementById("toggle-autoplay");
-          if (button) {
-            button.textContent = this.autoplay
-              ? "关闭自动播放"
-              : "开启自动播放";
-            this.badge.innerHTML = this.autoplay
-              ? liveIcon
-              : liveIconNoAutoPlay;
-          }
-          this.autoplay ? this.play() : this.stop();
-        });
+      this.dropMenu.classList.add("show");
     }
   }
 
@@ -156,8 +160,6 @@ export class LivePhotoViewer {
     if (!this.autoplay && !this.videoError) {
       this.stop();
     }
-    const controlButton = document.querySelector(".dropdown-menu");
-    controlButton?.remove();
   }
 
   private init(options: LivePhotoOptions): void {
@@ -185,8 +187,6 @@ export class LivePhotoViewer {
         if (!this.autoplay && !this.videoError) {
           this.stop();
         }
-        const controlButton = document.querySelector(".dropdown-menu");
-        controlButton?.remove();
       });
     }
   }

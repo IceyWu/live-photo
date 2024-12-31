@@ -92,7 +92,7 @@
 }
 
 .dropdown-menu {
-  display: none; /* 默认隐藏 */
+  display: none; 
   position: absolute;
   top: 50px;
   left: 16px;
@@ -106,7 +106,6 @@
   border-radius: 12px;
   color: #fff;
   cursor: pointer;
-  /* z-index: 10; */
 }
 .dropdown-menu.show {
   display: block;
