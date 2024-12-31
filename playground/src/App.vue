@@ -17,6 +17,8 @@ onMounted(() => {
       container: containerRef.value,
       width: 300,
       height: 300,
+      // width:'auto',
+      autoplay: false,
       // autoplay: true,
       onCanPlay: () => {
         console.log("onCanPlay");
@@ -40,9 +42,9 @@ onMounted(() => {
   }
 });
 </script>
-
+<!-- style="height: 300px; width: 300px; position: relative;" -->
 <template>
-  <div ref="containerRef"></div>
+  <div  ref="containerRef"></div>
 </template>
 
 <style scoped>

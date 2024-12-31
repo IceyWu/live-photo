@@ -3,111 +3,61 @@
   overflow: hidden;
 }
 
-.live-photo-image,
-.live-photo-video {
+.live-photo-container canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.live-photo-video {
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  opacity: 0;
-  transform: scale(1);
-}
-..live-photo-image {
-  opacity: 1;
 }
 
 .live-photo-badge {
-  cursor: default;
   display: flex;
   justify-content: center;
   align-items: center;
-  left: 16px;
-  position: absolute;
-  top: 16px;
-  z-index: 10;
-  -webkit-backdrop-filter: saturate(150%) blur(10px);
-  backdrop-filter: saturate(150%) blur(10px);
+  padding: 4px 6px;
   background: rgba(64, 64, 64, 0.25);
+  backdrop-filter: saturate(150%) blur(10px);
   border-radius: 12px;
   color: #fff;
-  cursor: pointer;
-  flex-wrap: nowrap;
-  height: 24px;
-  box-sizing: border-box;
-  padding: 0 2px;
+  font-size: 12px;
+  font-weight: 500;
+  height: 18px;
   transition: width 0.3s;
-  caret-color: transparent;
 }
 
 .live-photo-badge .live-icon {
   width: 16px;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 2px;
-}
 
+  margin-right: 4px;
+  height: 18px;
+}
 .live-photo-badge .live-text {
-  font-size: 12px;
-  font-weight: 500;
   /* line-height: 120%; */
-  margin-right: 1px;
-  margin-left: 2px;
+  margin-top: 1px;
+  margin-left: 3px;
 }
 
-/* 图标 */
 .live-photo-badge .chevron {
-  align-items: center;
-  display: flex;
+  width: 0px;
   height: 100%;
-  justify-content: center;
   opacity: 0;
-  transition: all 0.15s;
-  width: 8px;
+  transition: opacity 0.15s;
+  margin-right: 4px;
 }
 
 .live-photo-badge:hover .chevron {
   opacity: 1;
   width: 24px;
-}
-.live-photo-badge:hover::after {
-  content: "";
-  position: absolute;
-  left: 0px;
-  top: 24px;
-  bottom: 0;
-  right: auto;
-  height: 40px;
-  width: 200%;
-  background-color: none;
-  z-index: 10;
+  margin-right: 0px;
 }
 
 .dropdown-menu {
-  display: none; /* 默认隐藏 */
-  position: absolute;
-  top: 50px;
-  left: 16px;
-
   padding: 5px;
-  color: #fff;
-
-  -webkit-backdrop-filter: saturate(150%) blur(10px);
-  backdrop-filter: saturate(150%) blur(10px);
   background: rgba(64, 64, 64, 0.25);
+  backdrop-filter: saturate(150%) blur(10px);
   border-radius: 12px;
   color: #fff;
-  cursor: pointer;
-  /* z-index: 10; */
-}
-.dropdown-menu.show {
-  display: block;
 }
 
 .dropdown-menu button {
@@ -122,15 +72,4 @@
 
 .dropdown-menu button:hover {
   background: rgba(64, 64, 64, 0.5);
-}
-
-.live-photo-container.playing .live-photo-video {
-  display: block;
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-.live-photo-container.playing .live-photo-image {
-  /* display: none; */
-  opacity: 0;
 }

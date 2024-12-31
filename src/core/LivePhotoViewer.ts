@@ -16,50 +16,111 @@ export interface LivePhotoOptions {
 }
 
 export class LivePhotoViewer {
-  private photo: HTMLImageElement;
-  private video: HTMLVideoElement;
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
   private container: HTMLElement;
   private badge: HTMLDivElement;
+  private dropdownMenu: HTMLDivElement;
+  private photo: HTMLImageElement;
+  private video: HTMLVideoElement;
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
   private touchTimeout: number | undefined;
+  private width: number;
+  private height: number;
+  private transitionAlpha: number = 0;
+  private isTransitioning: boolean = false;
+  private animationFrameId: number | null = null;
 
   constructor(options: LivePhotoOptions) {
+    this.width = options.width || 300;
+    this.height = options.height || 300;
     this.autoplay = options.autoplay ?? true;
     this.container = this.createContainer(options);
+    this.canvas = this.createCanvas();
+    this.ctx = this.canvas.getContext("2d")!;
+    this.badge = this.createBadge();
+    this.dropdownMenu = this.createDropdownMenu();
     this.photo = this.createPhoto(options);
     this.video = this.createVideo(options);
-    this.badge = this.createBadge();
 
-    this.container.appendChild(this.photo);
-    this.container.appendChild(this.video);
+    this.container.appendChild(this.canvas);
     this.container.appendChild(this.badge);
+    this.container.appendChild(this.dropdownMenu);
     options.container.appendChild(this.container);
 
     this.touchTimeout = undefined;
 
     this.init(options);
+    this.updateBadgeIcon(); // 确保初始化时更新图标
   }
 
   private createContainer(options: LivePhotoOptions): HTMLElement {
     const container = document.createElement("div");
     container.className = "live-photo-container";
-    container.style.width = `${options.width || 300}px`;
-    container.style.height = `${options.height || 300}px`;
+    container.style.width = `${this.width}px`;
+    container.style.height = `${this.height}px`;
+    container.style.position = "relative";
+    container.style.overflow = "hidden";
     return container;
+  }
+
+  private createCanvas(): HTMLCanvasElement {
+    const canvas = document.createElement("canvas");
+    canvas.width = this.width;
+    canvas.height = this.height;
+    canvas.style.position = "absolute";
+    canvas.style.top = "0";
+    canvas.style.left = "0";
+    return canvas;
+  }
+
+  private createBadge(): HTMLDivElement {
+    const badge = document.createElement("div");
+    badge.className = "live-photo-badge";
+    badge.innerHTML = `
+    <span class="live-icon"></span>
+    <span class="live-text">LIVE</span>
+    <span class="chevron">
+      ${arrowIcon}
+    </span>
+  `;
+    badge.style.position = "absolute";
+    badge.style.top = "16px";
+    badge.style.left = "16px";
+    badge.style.zIndex = "10";
+    badge.style.cursor = "pointer";
+    return badge;
+  }
+
+  private createDropdownMenu(): HTMLDivElement {
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.className = "dropdown-menu";
+    dropdownMenu.innerHTML = `<button id="toggle-autoplay">开启自动播放</button>`;
+    dropdownMenu.style.display = "none";
+    dropdownMenu.style.position = "absolute";
+    dropdownMenu.style.top = "50px";
+    dropdownMenu.style.left = "16px";
+    dropdownMenu.style.zIndex = "11";
+    return dropdownMenu;
   }
 
   private createPhoto(options: LivePhotoOptions): HTMLImageElement {
     const photo = new Image();
     photo.src = options.photoSrc;
-    photo.className = "live-photo-image";
-    photo.addEventListener("load", () => {
+    // object-fit: cover
+    // photo.style.width = "100%";
+    // photo.style.height = "100%";
+    photo.style.objectFit = "cover";
+    // console.log('🌵-----photo-----', photo);
+    photo.onload = () => {
+      this.drawPhoto();
       if (options.onPhotoLoad) options.onPhotoLoad();
-    });
-    photo.addEventListener("error", () => {
+    };
+    photo.onerror = () => {
       if (options.onError) options.onError(new Error("Photo load error"));
-    });
+    };
     return photo;
   }
 
@@ -68,7 +129,7 @@ export class LivePhotoViewer {
     video.src = options.videoSrc;
     video.loop = false;
     video.muted = true;
-    video.className = "live-photo-video";
+    video.style.objectFit = "cover";
     video.addEventListener("canplay", () => {
       if (options.onCanPlay) options.onCanPlay();
     });
@@ -76,8 +137,6 @@ export class LivePhotoViewer {
       if (!video.loop) {
         this.stop();
         this.isPlaying = false;
-        this.container.classList.remove("playing");
-        this.autoplay = false;
         if (options.onEnded) options.onEnded();
       }
     });
@@ -85,64 +144,91 @@ export class LivePhotoViewer {
       if (options.onVideoLoad) options.onVideoLoad();
     });
     video.addEventListener("error", () => {
-      video.style.display = "none";
       this.videoError = true;
+      this.isPlaying = false;
       this.badge.innerHTML = errorIcon;
-      this.container.classList.remove("playing");
       if (options.onError) options.onError(new Error("Video load error"));
     });
     return video;
   }
 
-  private createBadge(): HTMLDivElement {
-    const badge = document.createElement("div");
-    badge.className = "live-photo-badge";
-    badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
+  private drawPhoto(): void {
+    this.ctx.clearRect(0, 0, this.width, this.height); // 清除画布
+    this.ctx.drawImage(this.photo, 0, 0, this.width, this.height);
+  }
 
-    const span = document.createElement("span");
-    const spanChevron = document.createElement("span");
-    span.className = "live-text";
-    span.innerText = "LIVE";
-    spanChevron.className = "chevron";
-    spanChevron.innerHTML = arrowIcon;
-    badge.appendChild(span);
-    badge.appendChild(spanChevron);
+  private drawVideo(): void {
+    this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
+  }
 
-    badge.style.transition = "width 0.3s";
-    badge.addEventListener("click", this.toggleAutoplay.bind(this));
+  private init(options: LivePhotoOptions): void {
+    this.updateBadgeIcon(); // 确保在初始化时更新图标
 
-    return badge;
+    if (this.autoplay) {
+      this.play();
+    }
+
+    this.badge.addEventListener("click", this.toggleDropdownMenu.bind(this));
+
+    if (this.isMobile()) {
+      this.badge.addEventListener(
+        "touchstart",
+        this.handleTouchStart.bind(this)
+      );
+      this.badge.addEventListener("touchend", this.handleTouchEnd.bind(this));
+    } else {
+      this.badge.addEventListener("mouseenter", () => {
+        if (!this.isPlaying && !this.videoError) {
+          this.play();
+        }
+      });
+
+      this.badge.addEventListener("mouseleave", () => {
+        if (!this.videoError) {
+          this.stop();
+        }
+      });
+    }
+
+    document
+      .getElementById("toggle-autoplay")
+      ?.addEventListener("click", () => {
+        this.toggleAutoplay();
+        this.hideDropdownMenu();
+      });
+  }
+
+  private toggleDropdownMenu(): void {
+    if (this.videoError) return;
+    if (this.dropdownMenu.style.display === "none") {
+      this.dropdownMenu.style.display = "block";
+    } else {
+      this.hideDropdownMenu();
+    }
+  }
+
+  private hideDropdownMenu(): void {
+    this.dropdownMenu.style.display = "none";
   }
 
   private toggleAutoplay(): void {
-    const hasControlButton = document.querySelector(".dropdown-menu");
-    if (hasControlButton) {
-      hasControlButton.remove();
+    this.autoplay = !this.autoplay;
+    const button = document.getElementById("toggle-autoplay");
+    if (button) {
+      button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
+    }
+    if (this.autoplay) {
+      this.play();
     } else {
-      const controlButton = document.createElement("div");
-      controlButton.className = "dropdown-menu";
-      controlButton.innerHTML = `<button id="toggle-autoplay">开启自动播放</button>`;
-      this.container.appendChild(controlButton);
+      this.stop();
+    }
+    this.updateBadgeIcon();
+  }
 
-      document
-        .getElementById("toggle-autoplay")
-        ?.addEventListener("click", () => {
-          this.autoplay = !this.autoplay;
-          const button = document.getElementById("toggle-autoplay");
-          if (button) {
-            button.textContent = this.autoplay
-              ? "关闭自动播放"
-              : "开启自动播放";
-            this.badge.innerHTML = this.autoplay
-              ? liveIcon
-              : liveIconNoAutoPlay;
-          }
-          if (this.autoplay) {
-            this.play();
-          } else {
-            this.stop();
-          }
-        });
+  private updateBadgeIcon(): void {
+    const iconElement = this.badge.querySelector(".live-icon");
+    if (iconElement) {
+      iconElement.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
     }
   }
 
@@ -155,43 +241,13 @@ export class LivePhotoViewer {
       if (!this.autoplay && !this.videoError) {
         this.play();
       }
-    }, 500); // 长按 500ms
+    }, 500);
   }
 
   private handleTouchEnd(): void {
     clearTimeout(this.touchTimeout);
     if (!this.autoplay && !this.videoError) {
       this.stop();
-    }
-    const controlButton = document.querySelector(".dropdown-menu");
-    controlButton?.remove();
-  }
-
-  private init(options: LivePhotoOptions): void {
-    if (this.autoplay) {
-      this.play();
-    }
-
-    if (this.isMobile()) {
-      this.container.addEventListener(
-        "touchstart",
-        this.handleTouchStart.bind(this)
-      );
-      this.container.addEventListener("touchend", this.handleTouchEnd.bind(this));
-    } else {
-      this.badge.addEventListener("mouseenter", () => {
-        if (!this.autoplay && !this.videoError) {
-          this.play();
-        }
-      });
-
-      this.badge.addEventListener("mouseleave", () => {
-        if (!this.autoplay && !this.videoError) {
-          this.stop();
-        }
-        const controlButton = document.querySelector(".dropdown-menu");
-        controlButton?.remove();
-      });
     }
   }
 
@@ -202,13 +258,10 @@ export class LivePhotoViewer {
       this.video.play();
 
       if (navigator.vibrate) {
-        navigator.vibrate(200); // 震动 200ms
+        navigator?.vibrate(200);
       }
 
-      requestAnimationFrame(() => {
-        this.container.classList.add("playing");
-        this.photo.style.opacity = "0";
-      });
+      this.startTransition(true);
     }
   }
 
@@ -216,7 +269,10 @@ export class LivePhotoViewer {
     if (this.isPlaying) {
       this.isPlaying = false;
       this.video.pause();
-      this.container.classList.remove("playing");
+      if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
     }
   }
 
@@ -233,9 +289,60 @@ export class LivePhotoViewer {
       this.isPlaying = false;
       this.video.pause();
       this.video.currentTime = 0;
-      this.container.classList.remove("playing");
-      this.photo.style.opacity = "1";
+      this.startTransition(false);
     }
+  }
+
+  private startTransition(toVideo: boolean): void {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+    this.transitionAlpha = toVideo ? 0 : 1;
+    this.animateTransition(toVideo);
+  }
+
+  private animateTransition(toVideo: boolean): void {
+    const animate = () => {
+      if (toVideo) {
+        this.transitionAlpha += 0.05;
+      } else {
+        this.transitionAlpha -= 0.05;
+      }
+
+      this.ctx.clearRect(0, 0, this.width, this.height);
+      this.drawPhoto();
+      this.ctx.globalAlpha = this.transitionAlpha;
+      this.drawVideo();
+      this.ctx.globalAlpha = 1;
+
+      if (
+        (toVideo && this.transitionAlpha < 1) ||
+        (!toVideo && this.transitionAlpha > 0)
+      ) {
+        this.animationFrameId = requestAnimationFrame(animate);
+      } else {
+        this.isTransitioning = false;
+        if (!toVideo) {
+          this.ctx.clearRect(0, 0, this.width, this.height);
+          this.drawPhoto();
+        } else {
+          this.continuePlayback();
+        }
+      }
+    };
+
+    animate();
+  }
+
+  private continuePlayback(): void {
+    const updateCanvas = () => {
+      if (this.isPlaying) {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.drawVideo();
+        this.animationFrameId = requestAnimationFrame(updateCanvas);
+      }
+    };
+
+    updateCanvas();
   }
 }
 
