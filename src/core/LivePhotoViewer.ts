@@ -53,7 +53,7 @@ export class LivePhotoViewer {
     this.touchTimeout = undefined;
 
     this.init(options);
-    this.updateBadgeIcon(); // 确保初始化时更新图标
+    this.updateBadgeIcon();
   }
 
   private createContainer(options: LivePhotoOptions): HTMLElement {
@@ -80,35 +80,17 @@ export class LivePhotoViewer {
     const badge = document.createElement("div");
     badge.className = "live-photo-badge";
     badge.innerHTML = `
-    <span class="live-icon"></span>
-    <span class="live-text">LIVE</span>
-    <span class="chevron">
-      ${arrowIcon}
-    </span>
-  `;
+      <span class="live-icon"></span>
+      <span class="live-text">LIVE</span>
+      <span class="chevron">${arrowIcon}</span>
+    `;
     badge.style.position = "absolute";
     badge.style.top = "16px";
     badge.style.left = "16px";
     badge.style.zIndex = "10";
     badge.style.cursor = "pointer";
-    badge.style.userSelect = "none"; // 添加这一行
-    badge.style.webkitUserSelect = "none"; // 添加这一行
-    badge.style.msUserSelect = "none"; // 添加这一行
-    badge.addEventListener("touchstart", (event) => {
-      event.preventDefault();
-    });
-    badge.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
-    badge.addEventListener("selectstart", (event) => {
-      event.preventDefault();
-    });
-    badge.addEventListener("touchmove", (event) => {
-      event.preventDefault();
-    });
-    badge.addEventListener("touchend", (event) => {
-      event.preventDefault();
-    });
+
+    this.addPreventDefaultListeners(badge);
     return badge;
   }
 
@@ -127,35 +109,16 @@ export class LivePhotoViewer {
   private createPhoto(options: LivePhotoOptions): HTMLImageElement {
     const photo = new Image();
     photo.src = options.photoSrc;
-    // object-fit: cover
-    // photo.style.width = "100%";
-    // photo.style.height = "100%";
     photo.style.objectFit = "cover";
-    photo.style.userSelect = "none"; // 添加这一行
-    photo.style.touchAction = "manipulation";
 
     photo.onload = () => {
       this.drawPhoto();
-      if (options.onPhotoLoad) options.onPhotoLoad();
+      options.onPhotoLoad?.();
     };
     photo.onerror = () => {
-      if (options.onError) options.onError(new Error("Photo load error"));
+      options.onError?.(new Error("Photo load error"));
     };
-    photo.addEventListener("touchstart", (event) => {
-      event.preventDefault();
-    });
-    photo.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
-    photo.addEventListener("selectstart", (event) => {
-      event.preventDefault();
-    });
-    photo.addEventListener("touchmove", (event) => {
-      event.preventDefault();
-    });
-    photo.addEventListener("touchend", (event) => {
-      event.preventDefault();
-    });
+    this.addPreventDefaultListeners(photo);
     return photo;
   }
 
@@ -165,6 +128,8 @@ export class LivePhotoViewer {
     video.loop = false;
     video.muted = true;
     video.style.objectFit = "cover";
+    video.playsInline = true;
+
     video.addEventListener("canplay", () => {
       if (options.onCanPlay) options.onCanPlay();
     });
@@ -172,7 +137,7 @@ export class LivePhotoViewer {
       if (!video.loop) {
         this.stop();
         this.isPlaying = false;
-        if (options.onEnded) options.onEnded();
+        options.onEnded?.();
       }
     });
     video.addEventListener("loadeddata", () => {
@@ -182,32 +147,28 @@ export class LivePhotoViewer {
       this.videoError = true;
       this.isPlaying = false;
       this.badge.innerHTML = errorIcon;
-      if (options.onError) options.onError(new Error("Video load error"));
+      options.onError?.(new Error("Video load error"));
     });
-    video.style.userSelect = "none"; // 添加这一行
-    video.playsInline = true;
-    video.style.touchAction = "manipulation";
-
-    video.addEventListener("touchstart", (event) => {
-      event.preventDefault();
-    });
-    video.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
-    video.addEventListener("selectstart", (event) => {
-      event.preventDefault();
-    });
-    video.addEventListener("touchmove", (event) => {
-      event.preventDefault();
-    });
-    video.addEventListener("touchend", (event) => {
-      event.preventDefault();
-    });
+    this.addPreventDefaultListeners(video);
     return video;
   }
 
+  private addPreventDefaultListeners(element: HTMLElement): void {
+    element.style.userSelect = "none";
+    element.style.touchAction = "manipulation";
+    element.addEventListener("touchstart", this.preventDefault);
+    element.addEventListener("mousedown", this.preventDefault);
+    element.addEventListener("selectstart", this.preventDefault);
+    element.addEventListener("touchmove", this.preventDefault);
+    element.addEventListener("touchend", this.preventDefault);
+  }
+
+  private preventDefault(event: Event): void {
+    event.preventDefault();
+  }
+
   private drawPhoto(): void {
-    this.ctx.clearRect(0, 0, this.width, this.height); // 清除画布
+    this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.drawImage(this.photo, 0, 0, this.width, this.height);
   }
 
@@ -216,7 +177,7 @@ export class LivePhotoViewer {
   }
 
   private init(options: LivePhotoOptions): void {
-    this.updateBadgeIcon(); // 确保在初始化时更新图标
+    this.updateBadgeIcon();
 
     if (this.autoplay) {
       this.play();
@@ -229,7 +190,6 @@ export class LivePhotoViewer {
         "touchstart",
         this.handleTouchStart.bind(this)
       );
-
       this.container.addEventListener(
         "touchend",
         this.handleTouchEnd.bind(this)
@@ -258,11 +218,8 @@ export class LivePhotoViewer {
 
   private toggleDropdownMenu(): void {
     if (this.videoError) return;
-    if (this.dropdownMenu.style.display === "none") {
-      this.dropdownMenu.style.display = "block";
-    } else {
-      this.hideDropdownMenu();
-    }
+    this.dropdownMenu.style.display =
+      this.dropdownMenu.style.display === "none" ? "block" : "none";
   }
 
   private hideDropdownMenu(): void {
@@ -275,11 +232,7 @@ export class LivePhotoViewer {
     if (button) {
       button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
     }
-    if (this.autoplay) {
-      this.play();
-    } else {
-      this.stop();
-    }
+    this.autoplay ? this.play() : this.stop();
     this.updateBadgeIcon();
   }
 
@@ -309,27 +262,19 @@ export class LivePhotoViewer {
     }
   }
 
+  private vibrateDevice(): void {
+    if (navigator.vibrate) {
+      navigator.vibrate(200); // 震动200毫秒
+    }
+  }
+
   public play(): void {
     if (!this.isPlaying && !this.videoError) {
       this.isPlaying = true;
       this.video.currentTime = 0;
       this.video.play();
-
-      // 兼容iOS和安卓的震动逻辑
-      // if (typeof window === "object" && "vibrate" in navigator) {
-      //   if (navigator.vibrate) {
-      //     const vibrationPattern = [200];
-      //     navigator.vibrate(vibrationPattern);
-      //   }
-      // } else if (typeof window === "object" && "webkit" in window) {
-      //   // iOS 10+ 支持的HapticFeedback
-      //   const haptic = new (window as any).UIImpactFeedbackGenerator(
-      //     (window as any).UIImpactFeedbackStyleMedium
-      //   );
-      //   haptic.impactOccurred();
-      // }
-
       this.startTransition(true);
+      this.vibrateDevice();
     }
   }
 
@@ -345,11 +290,7 @@ export class LivePhotoViewer {
   }
 
   public toggle(): void {
-    if (this.isPlaying) {
-      this.pause();
-    } else {
-      this.play();
-    }
+    this.isPlaying ? this.pause() : this.play();
   }
 
   public stop(): void {
@@ -370,11 +311,7 @@ export class LivePhotoViewer {
 
   private animateTransition(toVideo: boolean): void {
     const animate = () => {
-      if (toVideo) {
-        this.transitionAlpha += 0.05;
-      } else {
-        this.transitionAlpha -= 0.05;
-      }
+      this.transitionAlpha += toVideo ? 0.05 : -0.05;
 
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.drawPhoto();
