@@ -1,6 +1,8 @@
 .live-photo-container {
   position: relative;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .live-photo-container canvas {

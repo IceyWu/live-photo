@@ -91,6 +91,24 @@ export class LivePhotoViewer {
     badge.style.left = "16px";
     badge.style.zIndex = "10";
     badge.style.cursor = "pointer";
+    badge.style.userSelect = "none"; // 添加这一行
+    badge.style.webkitUserSelect = "none"; // 添加这一行
+    badge.style.msUserSelect = "none"; // 添加这一行
+    badge.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+    });
+    badge.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+    badge.addEventListener("selectstart", (event) => {
+      event.preventDefault();
+    });
+    badge.addEventListener("touchmove", (event) => {
+      event.preventDefault();
+    });
+    badge.addEventListener("touchend", (event) => {
+      event.preventDefault();
+    });
     return badge;
   }
 
@@ -113,7 +131,9 @@ export class LivePhotoViewer {
     // photo.style.width = "100%";
     // photo.style.height = "100%";
     photo.style.objectFit = "cover";
-    // console.log('🌵-----photo-----', photo);
+    photo.style.userSelect = "none"; // 添加这一行
+    photo.style.touchAction = "manipulation";
+
     photo.onload = () => {
       this.drawPhoto();
       if (options.onPhotoLoad) options.onPhotoLoad();
@@ -121,6 +141,21 @@ export class LivePhotoViewer {
     photo.onerror = () => {
       if (options.onError) options.onError(new Error("Photo load error"));
     };
+    photo.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+    });
+    photo.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+    photo.addEventListener("selectstart", (event) => {
+      event.preventDefault();
+    });
+    photo.addEventListener("touchmove", (event) => {
+      event.preventDefault();
+    });
+    photo.addEventListener("touchend", (event) => {
+      event.preventDefault();
+    });
     return photo;
   }
 
@@ -149,6 +184,25 @@ export class LivePhotoViewer {
       this.badge.innerHTML = errorIcon;
       if (options.onError) options.onError(new Error("Video load error"));
     });
+    video.style.userSelect = "none"; // 添加这一行
+    video.playsInline = true;
+    video.style.touchAction = "manipulation";
+
+    video.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+    });
+    video.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+    video.addEventListener("selectstart", (event) => {
+      event.preventDefault();
+    });
+    video.addEventListener("touchmove", (event) => {
+      event.preventDefault();
+    });
+    video.addEventListener("touchend", (event) => {
+      event.preventDefault();
+    });
     return video;
   }
 
@@ -171,11 +225,15 @@ export class LivePhotoViewer {
     this.badge.addEventListener("click", this.toggleDropdownMenu.bind(this));
 
     if (this.isMobile()) {
-      this.badge.addEventListener(
+      this.container.addEventListener(
         "touchstart",
         this.handleTouchStart.bind(this)
       );
-      this.badge.addEventListener("touchend", this.handleTouchEnd.bind(this));
+
+      this.container.addEventListener(
+        "touchend",
+        this.handleTouchEnd.bind(this)
+      );
     } else {
       this.badge.addEventListener("mouseenter", () => {
         if (!this.isPlaying && !this.videoError) {
@@ -257,9 +315,19 @@ export class LivePhotoViewer {
       this.video.currentTime = 0;
       this.video.play();
 
-      if (navigator.vibrate) {
-        navigator?.vibrate(200);
-      }
+      // 兼容iOS和安卓的震动逻辑
+      // if (typeof window === "object" && "vibrate" in navigator) {
+      //   if (navigator.vibrate) {
+      //     const vibrationPattern = [200];
+      //     navigator.vibrate(vibrationPattern);
+      //   }
+      // } else if (typeof window === "object" && "webkit" in window) {
+      //   // iOS 10+ 支持的HapticFeedback
+      //   const haptic = new (window as any).UIImpactFeedbackGenerator(
+      //     (window as any).UIImpactFeedbackStyleMedium
+      //   );
+      //   haptic.impactOccurred();
+      // }
 
       this.startTransition(true);
     }
