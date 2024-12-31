@@ -17,7 +17,7 @@ onMounted(() => {
       container: containerRef.value,
       width: 300,
       height: 300,
-      // autoplay: true,
+      autoplay: false,
       onCanPlay: () => {
         console.log("onCanPlay");
       },

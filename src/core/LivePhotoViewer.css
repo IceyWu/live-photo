@@ -1,6 +1,8 @@
 .live-photo-container {
   position: relative;
   overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .live-photo-image,

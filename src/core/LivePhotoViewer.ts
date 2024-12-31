@@ -54,12 +54,11 @@ export class LivePhotoViewer {
     const photo = new Image();
     photo.src = options.photoSrc;
     photo.className = "live-photo-image";
-    photo.addEventListener("load", () => {
-      if (options.onPhotoLoad) options.onPhotoLoad();
-    });
-    photo.addEventListener("error", () => {
-      if (options.onError) options.onError(new Error("Photo load error"));
-    });
+    photo.addEventListener("load", () => options.onPhotoLoad?.());
+    photo.addEventListener("error", () =>
+      options.onError?.(new Error("Photo load error"))
+    );
+    this.addPreventDefaultListeners(photo);
     return photo;
   }
 
@@ -68,29 +67,27 @@ export class LivePhotoViewer {
     video.src = options.videoSrc;
     video.loop = false;
     video.muted = true;
+    video.playsInline = true;
     video.className = "live-photo-video";
-    video.addEventListener("canplay", () => {
-      if (options.onCanPlay) options.onCanPlay();
-    });
+    video.addEventListener("canplay", () => options.onCanPlay?.());
     video.addEventListener("ended", () => {
       if (!video.loop) {
         this.stop();
         this.isPlaying = false;
         this.container.classList.remove("playing");
         this.autoplay = false;
-        if (options.onEnded) options.onEnded();
+        options.onEnded?.();
       }
     });
-    video.addEventListener("loadeddata", () => {
-      if (options.onVideoLoad) options.onVideoLoad();
-    });
+    video.addEventListener("loadeddata", () => options.onVideoLoad?.());
     video.addEventListener("error", () => {
       video.style.display = "none";
       this.videoError = true;
       this.badge.innerHTML = errorIcon;
       this.container.classList.remove("playing");
-      if (options.onError) options.onError(new Error("Video load error"));
+      options.onError?.(new Error("Video load error"));
     });
+    this.addPreventDefaultListeners(video);
     return video;
   }
 
@@ -137,11 +134,7 @@ export class LivePhotoViewer {
               ? liveIcon
               : liveIconNoAutoPlay;
           }
-          if (this.autoplay) {
-            this.play();
-          } else {
-            this.stop();
-          }
+          this.autoplay ? this.play() : this.stop();
         });
     }
   }
@@ -177,7 +170,10 @@ export class LivePhotoViewer {
         "touchstart",
         this.handleTouchStart.bind(this)
       );
-      this.container.addEventListener("touchend", this.handleTouchEnd.bind(this));
+      this.container.addEventListener(
+        "touchend",
+        this.handleTouchEnd.bind(this)
+      );
     } else {
       this.badge.addEventListener("mouseenter", () => {
         if (!this.autoplay && !this.videoError) {
@@ -195,6 +191,20 @@ export class LivePhotoViewer {
     }
   }
 
+  private addPreventDefaultListeners(element: HTMLElement): void {
+    element.style.userSelect = "none";
+    element.style.touchAction = "manipulation";
+    element.addEventListener("touchstart", this.preventDefault);
+    element.addEventListener("mousedown", this.preventDefault);
+    element.addEventListener("selectstart", this.preventDefault);
+    element.addEventListener("touchmove", this.preventDefault);
+    element.addEventListener("touchend", this.preventDefault);
+  }
+
+  private preventDefault(event: Event): void {
+    event.preventDefault();
+  }
+
   public play(): void {
     if (!this.isPlaying && !this.videoError) {
       this.isPlaying = true;
@@ -203,6 +213,12 @@ export class LivePhotoViewer {
 
       if (navigator.vibrate) {
         navigator.vibrate(200); // 震动 200ms
+      } else {
+        // iOS 设备兼容处理
+        // const silentAudio = new Audio(
+        //   "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAMEQAA=="
+        // );
+        // silentAudio.play().catch(() => {});
       }
 
       requestAnimationFrame(() => {
@@ -221,11 +237,7 @@ export class LivePhotoViewer {
   }
 
   public toggle(): void {
-    if (this.isPlaying) {
-      this.pause();
-    } else {
-      this.play();
-    }
+    this.isPlaying ? this.pause() : this.play();
   }
 
   public stop(): void {
