@@ -16,15 +16,15 @@ export interface LivePhotoOptions {
 }
 
 export class LivePhotoViewer {
-  private photo: HTMLImageElement;
-  private video: HTMLVideoElement;
-  private container: HTMLElement;
-  private badge: HTMLDivElement;
-  private dropMenu: HTMLDivElement;
+  private readonly photo: HTMLImageElement;
+  private readonly video: HTMLVideoElement;
+  private readonly container: HTMLElement;
+  private readonly badge: HTMLDivElement;
+  private readonly dropMenu: HTMLDivElement;
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
-  private touchTimeout: number | undefined;
+  private touchTimeout?: number;
 
   constructor(options: LivePhotoOptions) {
     this.autoplay = options.autoplay ?? true;
@@ -67,31 +67,46 @@ export class LivePhotoViewer {
 
   private createVideo(options: LivePhotoOptions): HTMLVideoElement {
     const video = document.createElement("video");
-    video.src = options.videoSrc;
-    video.loop = false;
-    video.muted = true;
-    video.playsInline = true;
-    video.className = "live-photo-video";
-    video.addEventListener("canplay", () => options.onCanPlay?.());
-    video.addEventListener("ended", () => {
-      if (!video.loop) {
-        this.stop();
-        this.isPlaying = false;
-        this.container.classList.remove("playing");
-        this.autoplay = false;
-        options.onEnded?.();
-      }
+    const videoAttributes = {
+      src: options.videoSrc,
+      loop: false,
+      muted: true,
+      playsInline: true,
+      className: "live-photo-video",
+    };
+
+    Object.entries(videoAttributes).forEach(([key, value]) => {
+      video[key] = value;
     });
-    video.addEventListener("loadeddata", () => options.onVideoLoad?.());
-    video.addEventListener("error", () => {
-      video.style.display = "none";
-      this.videoError = true;
-      this.badge.innerHTML = errorIcon;
-      this.container.classList.remove("playing");
-      options.onError?.(new Error("Video load error"));
+
+    video.addEventListener("loadedmetadata", () => {
+      options.onCanPlay?.();
+      options.onVideoLoad?.();
     });
+
+    video.addEventListener("ended", () => this.handleVideoEnd(options));
+    video.addEventListener("error", () => this.handleVideoError(options));
+
     this.addPreventDefaultListeners(video);
     return video;
+  }
+
+  private handleVideoEnd(options: LivePhotoOptions): void {
+    if (!this.video.loop) {
+      this.stop();
+      this.isPlaying = false;
+      this.container.classList.remove("playing");
+      this.autoplay = false;
+      options.onEnded?.();
+    }
+  }
+
+  private handleVideoError(options: LivePhotoOptions): void {
+    this.video.style.display = "none";
+    this.videoError = true;
+    this.badge.innerHTML = errorIcon;
+    this.container.classList.remove("playing");
+    this.handleError(new Error("Video load error"), options.onError);
   }
 
   private createBadge(): HTMLDivElement {
@@ -109,7 +124,7 @@ export class LivePhotoViewer {
     badge.appendChild(spanChevron);
 
     badge.style.transition = "width 0.3s";
-    badge.addEventListener("click", this.toggleAutoplay.bind(this));
+    spanChevron.addEventListener("click", this.toggleAutoplay.bind(this));
 
     return badge;
   }
@@ -120,7 +135,8 @@ export class LivePhotoViewer {
     ctrBtn.id = "toggle-autoplay";
     ctrBtn.innerHTML = `开启自动播放`;
     controlButton.append(ctrBtn);
-    ctrBtn?.addEventListener("click", () => {
+    ctrBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
       this.autoplay = !this.autoplay;
       const button = document.getElementById("toggle-autoplay");
       if (button) {
@@ -129,7 +145,6 @@ export class LivePhotoViewer {
         this.badge.innerHTML += `<span class="live-text">LIVE</span><span class="chevron">${arrowIcon}</span>`;
       }
       this.autoplay ? this.play() : this.stop();
-      this.toggleAutoplay()
     });
 
     return controlButton;
@@ -205,26 +220,25 @@ export class LivePhotoViewer {
     event.preventDefault();
   }
 
-  public play(): void {
+  public async play(): Promise<void> {
     if (!this.isPlaying && !this.videoError) {
-      this.isPlaying = true;
-      this.video.currentTime = 0;
-      this.video.play();
+      try {
+        this.isPlaying = true;
+        this.video.currentTime = 0;
+        await this.video.play();
 
-      if (navigator.vibrate) {
-        navigator.vibrate(200); // 震动 200ms
-      } else {
-        // iOS 设备兼容处理
-        // const silentAudio = new Audio(
-        //   "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAMEQAA=="
-        // );
-        // silentAudio.play().catch(() => {});
+        if (navigator.vibrate) {
+          navigator.vibrate(200);
+        }
+
+        requestAnimationFrame(() => {
+          this.container.classList.add("playing");
+          this.photo.style.opacity = "0";
+        });
+      } catch (error) {
+        this.handleError(error as Error);
+        this.stop();
       }
-
-      requestAnimationFrame(() => {
-        this.container.classList.add("playing");
-        this.photo.style.opacity = "0";
-      });
     }
   }
 
@@ -248,6 +262,11 @@ export class LivePhotoViewer {
       this.container.classList.remove("playing");
       this.photo.style.opacity = "1";
     }
+  }
+
+  private handleError(error: Error, callback?: (e?: any) => void): void {
+    console.error("LivePhotoViewer Error:", error);
+    callback?.(error);
   }
 }
 
