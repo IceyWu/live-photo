@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.0.44
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.43...v0.0.44)
+
+### 🚀 Enhancements
+
+- 优化 LivePhotoViewer 组件，增强性能和用户交互体验 ([574d0d5](https://github.com/iceywu/live-photo/commit/574d0d5))
+- 添加视频延迟加载和进度显示功能，优化用户体验 ([ccf224f](https://github.com/iceywu/live-photo/commit/ccf224f))
+- 更新 LivePhotoViewer 组件，添加自动播放控制和进度图标显示功能 ([ca3e613](https://github.com/iceywu/live-photo/commit/ca3e613))
+- 更新 README 文件，添加 lazyLoadVideo 参数和 onProgress 回调，增强配置选项说明 ([ce80cd5](https://github.com/iceywu/live-photo/commit/ce80cd5))
+- 添加图片和视频自定义配置选项，优化用户体验 ([bdee36c](https://github.com/iceywu/live-photo/commit/bdee36c))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.43
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.42...v0.0.43)
