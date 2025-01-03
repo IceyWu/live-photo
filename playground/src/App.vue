@@ -17,8 +17,29 @@ onMounted(() => {
       container: containerRef.value,
       width: 300,
       height: 300,
-      autoplay: false,
-      lazyLoadVideo: true, // 启用延迟加载
+      // autoplay: false,
+      // lazyLoadVideo: true, // 启用延迟加载 
+      imageCustomization: {
+        styles: {
+          objectFit: "cover",
+          borderRadius: "8px",
+          filter: "brightness(1.1)",
+        },
+        attributes: {
+          alt: "Live Photo",
+          loading: "lazy",
+        },
+      },
+      videoCustomization: {
+        styles: {
+          objectFit: "contain",
+          borderRadius: "8px",
+        },
+        attributes: {
+          preload: "metadata",
+          controlsList: "nodownload",
+        },
+      },
       onProgress: (progress) => {
         console.log(`视频加载进度: ${progress}%`);
       },

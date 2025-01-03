@@ -1,6 +1,11 @@
 import "./LivePhotoViewer.css";
 import { arrowIcon, errorIcon, createProgressLiveIcon } from "./icons";
 
+export interface ElementCustomization {
+  attributes?: { [key: string]: string }; // HTML 属性
+  styles?: { [key: string]: string }; // CSS 样式
+}
+
 export interface LivePhotoOptions {
   photoSrc: string;
   videoSrc: string;
@@ -8,13 +13,15 @@ export interface LivePhotoOptions {
   width?: number;
   height?: number;
   autoplay?: boolean;
-  lazyLoadVideo?: boolean; // 新增：控制视频是否延迟加载
+  lazyLoadVideo?: boolean;
+  imageCustomization?: ElementCustomization; // 图片自定义配置
+  videoCustomization?: ElementCustomization; // 视频自定义配置
   onCanPlay?: () => void;
   onError?: (e?: any) => void;
   onEnded?: () => void;
   onVideoLoad?: () => void;
   onPhotoLoad?: () => void;
-  onProgress?: (progress: number) => void; // 新增：视频加载进度回调
+  onProgress?: (progress: number) => void;
 }
 
 export class LivePhotoViewer {
@@ -80,6 +87,24 @@ export class LivePhotoViewer {
     const photo = new Image();
     photo.src = options.photoSrc;
     photo.className = "live-photo-image";
+
+    // 应用自定义样式和属性
+    if (options.imageCustomization) {
+      // 应用样式
+      if (options.imageCustomization.styles) {
+        for (const prop in options.imageCustomization.styles) {
+          photo.style[prop as any] = options.imageCustomization.styles[prop];
+        }
+      }
+
+      // 应用属性
+      if (options.imageCustomization.attributes) {
+        for (const key in options.imageCustomization.attributes) {
+          photo.setAttribute(key, options.imageCustomization.attributes[key]);
+        }
+      }
+    }
+
     photo.addEventListener("load", () => options.onPhotoLoad?.());
     photo.addEventListener("error", () =>
       options.onError?.(new Error("Photo load error"))
@@ -89,7 +114,7 @@ export class LivePhotoViewer {
   }
   private updateBadgeProgress(progress: number): void {
     if (this.badge) {
-      const iconHtml = createProgressLiveIcon(progress, this.autoplay);
+      const iconHtml = createProgressLiveIcon(progress, !this.autoplay);
 
       // 保留原有的 LIVE 文本和箭头
       this.badge.innerHTML = `
@@ -102,17 +127,35 @@ export class LivePhotoViewer {
 
   private createVideo(options: LivePhotoOptions): HTMLVideoElement {
     const video = document.createElement("video");
-    const videoAttributes = {
-      // src: options.videoSrc,
+    const defaultVideoAttributes = {
       loop: false,
       muted: true,
       playsInline: true,
       className: "live-photo-video",
     };
 
-    Object.entries(videoAttributes).forEach(([key, value]) => {
-      video[key] = value;
-    });
+    // 应用默认属性
+    for (const key in defaultVideoAttributes) {
+      (video as any)[key] =
+        defaultVideoAttributes[key as keyof typeof defaultVideoAttributes];
+    }
+
+    // 应用自定义样式和属性
+    if (options.videoCustomization) {
+      // 应用样式
+      if (options.videoCustomization.styles) {
+        for (const prop in options.videoCustomization.styles) {
+          video.style[prop as any] = options.videoCustomization.styles[prop];
+        }
+      }
+
+      // 应用属性
+      if (options.videoCustomization.attributes) {
+        for (const key in options.videoCustomization.attributes) {
+          video.setAttribute(key, options.videoCustomization.attributes[key]);
+        }
+      }
+    }
 
     // 只有在非延迟加载模式下才立即设置视频源
     if (!options.lazyLoadVideo) {
@@ -134,15 +177,7 @@ export class LivePhotoViewer {
           // 加载完成后恢复原始图标
           if (progress >= 100) {
             setTimeout(() => {
-              this.badge.innerHTML = `
-                ${
-                  this.autoplay
-                    ? createProgressLiveIcon(100, this.autoplay)
-                    : createProgressLiveIcon(100, true)
-                }
-                <span class="live-text">LIVE</span>
-                <span class="chevron">${arrowIcon}</span>
-              `;
+              this.updateBadge();
             }, 500);
           }
         }
@@ -186,9 +221,7 @@ export class LivePhotoViewer {
   private createBadge(): HTMLDivElement {
     const badge = document.createElement("div");
     badge.className = "live-photo-badge";
-    badge.innerHTML = this.autoplay
-      ? createProgressLiveIcon(100, this.autoplay)
-      : createProgressLiveIcon(100, true);
+    badge.innerHTML = createProgressLiveIcon(100, !this.autoplay);
 
     const span = document.createElement("span");
     const spanChevron = document.createElement("span");
@@ -211,7 +244,7 @@ export class LivePhotoViewer {
     controlButton.className = "dropdown-menu";
     const ctrBtn = document.createElement("button");
     ctrBtn.id = "toggle-autoplay";
-    ctrBtn.innerHTML = `开启自动播放`;
+    ctrBtn.innerHTML = this.autoplay ? "关闭自动播放" : "开启自动播放";
     controlButton.append(ctrBtn);
 
     ctrBtn?.addEventListener("click", (e) => {
@@ -281,13 +314,13 @@ export class LivePhotoViewer {
       );
     } else {
       this.badge.addEventListener("mouseenter", () => {
-        if (!this.autoplay && !this.videoError) {
+        if (!this.videoError) {
           this.play();
         }
       });
 
       this.badge.addEventListener("mouseleave", () => {
-        if (!this.autoplay && !this.videoError) {
+        if (!this.videoError) {
           this.stop();
         }
       });
@@ -314,7 +347,7 @@ export class LivePhotoViewer {
         if (!this.videoLoaded && !this.video.src) {
           this.progressBar.style.opacity = "1";
           this.updateBadgeProgress(0);
-          this.video.src = this.videoSrc;
+          this.video.src = this.videoSrc ?? "";
         }
         this.isPlaying = true;
         this.video.currentTime = 0;

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue 3 LivePhoto Viewer Demo</title>
+    <!-- <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script> -->
     <script src="../dist/LivePhotoViewer.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   </head>
@@ -15,8 +16,10 @@
       const App = {
         setup() {
           const demoSource = {
-            photoSrc: "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
-            videoSrc: "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
+            photoSrc:
+              "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+            videoSrc:
+              "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
           };
           const containerRef = ref(null);
 
@@ -27,6 +30,16 @@
               container: containerRef.value,
               width: 300,
               height: 300,
+              imageCustomization: {
+                styles: {
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                },
+                attributes: {
+                  alt: "Live Photo Demo",
+                  loading: "lazy",
+                },
+              },
             });
           });
 
@@ -35,7 +48,7 @@
         template: '<div ref="containerRef"></div>',
       };
 
-      createApp(App).mount('#vue3-demo');
+      createApp(App).mount("#vue3-demo");
     </script>
   </body>
-</html> 
+</html>
