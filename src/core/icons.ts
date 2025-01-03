@@ -31,7 +31,7 @@ export const errorIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-linejoin="round" d="m3.5 3.5l9 9m2-4.5a6.5 6.5 0 1 1-13 0a6.5 6.5 0 0 1 13 0Z"/></svg>
  `;
 
-export const createProgressLiveIcon = (progress: number) => {
+export const createProgressLiveIcon = (progress: number, showSlash: boolean = false) => {
   // 图标尺寸常量
   const ICON_SIZE = 12; // SVG 整体尺寸
   const CENTER_DOT_RADIUS = 1; // 中心圆点半径
@@ -50,12 +50,16 @@ export const createProgressLiveIcon = (progress: number) => {
     return `<circle cx="${x}" cy="${y}" r="${OUTER_DOT_RADIUS}" fill="currentColor" opacity="${opacity}" />`;
   }).join("");
 
+  // 添加斜杠的SVG路径
+  const slash = showSlash ? `<path d="M1 11L11 1" stroke="currentColor" stroke-width="1.5"/>` : '';
+
   return `
   <svg xmlns="http://www.w3.org/2000/svg" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="0 0 ${ICON_SIZE} ${ICON_SIZE}">
     <g fill="none" stroke="currentColor" stroke-width="${INNER_CIRCLE_STROKE}">
       <circle cx="${center}" cy="${center}" r="${CENTER_DOT_RADIUS}" fill="currentColor"/>
       <circle cx="${center}" cy="${center}" r="${INNER_CIRCLE_RADIUS}" />
       ${dots}
+      ${slash}
     </g>
   </svg>
 `;

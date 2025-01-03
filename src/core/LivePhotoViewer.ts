@@ -1,5 +1,5 @@
 import "./LivePhotoViewer.css";
-import { liveIcon, liveIconNoAutoPlay, arrowIcon, errorIcon,createProgressLiveIcon } from "./icons";
+import { arrowIcon, errorIcon, createProgressLiveIcon } from "./icons";
 
 export interface LivePhotoOptions {
   photoSrc: string;
@@ -89,7 +89,8 @@ export class LivePhotoViewer {
   }
   private updateBadgeProgress(progress: number): void {
     if (this.badge) {
-      const iconHtml = createProgressLiveIcon(progress);
+      const iconHtml = createProgressLiveIcon(progress, this.autoplay);
+
       // 保留原有的 LIVE 文本和箭头
       this.badge.innerHTML = `
         ${iconHtml}
@@ -121,18 +122,24 @@ export class LivePhotoViewer {
     let lastProgress = 0;
     video.addEventListener("progress", () => {
       if (video.buffered.length > 0) {
-        const progress = Math.floor((video.buffered.end(0) / video.duration) * 100);
+        const progress = Math.floor(
+          (video.buffered.end(0) / video.duration) * 100
+        );
         // 只在进度发生实际变化时更新
         if (progress !== lastProgress) {
           lastProgress = progress;
           this.updateBadgeProgress(progress);
           options.onProgress?.(progress);
-          
+
           // 加载完成后恢复原始图标
           if (progress >= 100) {
             setTimeout(() => {
               this.badge.innerHTML = `
-                ${this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay}
+                ${
+                  this.autoplay
+                    ? createProgressLiveIcon(100, this.autoplay)
+                    : createProgressLiveIcon(100, true)
+                }
                 <span class="live-text">LIVE</span>
                 <span class="chevron">${arrowIcon}</span>
               `;
@@ -145,7 +152,9 @@ export class LivePhotoViewer {
     // 添加更多进度事件监听
     video.addEventListener("loadeddata", () => {
       if (video.buffered.length > 0) {
-        const progress = Math.floor((video.buffered.end(0) / video.duration) * 100);
+        const progress = Math.floor(
+          (video.buffered.end(0) / video.duration) * 100
+        );
         this.updateBadgeProgress(progress);
       }
     });
@@ -162,7 +171,6 @@ export class LivePhotoViewer {
       this.stop();
       this.isPlaying = false;
       this.container.classList.remove("playing");
-      this.autoplay = false;
       options.onEnded?.();
     }
   }
@@ -178,7 +186,9 @@ export class LivePhotoViewer {
   private createBadge(): HTMLDivElement {
     const badge = document.createElement("div");
     badge.className = "live-photo-badge";
-    badge.innerHTML = this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay;
+    badge.innerHTML = this.autoplay
+      ? createProgressLiveIcon(100, this.autoplay)
+      : createProgressLiveIcon(100, true);
 
     const span = document.createElement("span");
     const spanChevron = document.createElement("span");
@@ -190,7 +200,9 @@ export class LivePhotoViewer {
     badge.appendChild(spanChevron);
 
     badge.style.transition = "width 0.3s";
-    spanChevron.addEventListener("click", this.toggleAutoplay.bind(this));
+    badge.addEventListener("click", () => {
+      this.toggleAutoplay();
+    });
 
     return badge;
   }
@@ -201,19 +213,29 @@ export class LivePhotoViewer {
     ctrBtn.id = "toggle-autoplay";
     ctrBtn.innerHTML = `开启自动播放`;
     controlButton.append(ctrBtn);
+
     ctrBtn?.addEventListener("click", (e) => {
       e.stopPropagation();
+
       this.autoplay = !this.autoplay;
       const button = document.getElementById("toggle-autoplay");
       if (button) {
         button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
-        this.badge.innerHTML = this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay;
-        this.badge.innerHTML += `<span class="live-text">LIVE</span><span class="chevron">${arrowIcon}</span>`;
+        this.updateBadge();
       }
+      this.toggleAutoplay();
       this.autoplay ? this.play() : this.stop();
     });
 
     return controlButton;
+  }
+
+  private updateBadge(): void {
+    this.badge.innerHTML = `
+        ${createProgressLiveIcon(100, !this.autoplay)}
+        <span class="live-text">LIVE</span>
+        <span class="chevron">${arrowIcon}</span>
+    `;
   }
 
   private toggleAutoplay(): void {
@@ -296,6 +318,7 @@ export class LivePhotoViewer {
         }
         this.isPlaying = true;
         this.video.currentTime = 0;
+        this.updateBadge();
         await this.video.play();
 
         if (navigator.vibrate) {
