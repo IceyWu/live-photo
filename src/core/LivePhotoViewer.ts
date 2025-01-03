@@ -1,5 +1,5 @@
 import "./LivePhotoViewer.css";
-import { liveIcon, liveIconNoAutoPlay, arrowIcon, errorIcon } from "./icons";
+import { liveIcon, liveIconNoAutoPlay, arrowIcon, errorIcon,createProgressLiveIcon } from "./icons";
 
 export interface LivePhotoOptions {
   photoSrc: string;
@@ -8,11 +8,13 @@ export interface LivePhotoOptions {
   width?: number;
   height?: number;
   autoplay?: boolean;
+  lazyLoadVideo?: boolean; // 新增：控制视频是否延迟加载
   onCanPlay?: () => void;
   onError?: (e?: any) => void;
   onEnded?: () => void;
   onVideoLoad?: () => void;
   onPhotoLoad?: () => void;
+  onProgress?: (progress: number) => void; // 新增：视频加载进度回调
 }
 
 export class LivePhotoViewer {
@@ -21,10 +23,13 @@ export class LivePhotoViewer {
   private readonly container: HTMLElement;
   private readonly badge: HTMLDivElement;
   private readonly dropMenu: HTMLDivElement;
+  private readonly progressBar: HTMLDivElement; // 新增：进度条元素
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
   private touchTimeout?: number;
+  private videoLoaded: boolean = false; // 新增：标记视频是否已加载
+  private videoSrc?: string = "";
 
   constructor(options: LivePhotoOptions) {
     this.autoplay = options.autoplay ?? true;
@@ -33,6 +38,8 @@ export class LivePhotoViewer {
     this.video = this.createVideo(options);
     this.badge = this.createBadge();
     this.dropMenu = this.createDropMenu();
+    this.progressBar = this.createProgressBar();
+    this.container.appendChild(this.progressBar);
 
     this.container.appendChild(this.photo);
     this.container.appendChild(this.video);
@@ -41,8 +48,24 @@ export class LivePhotoViewer {
     options.container.appendChild(this.container);
 
     this.touchTimeout = undefined;
+    this.videoSrc = options.videoSrc || "";
 
     this.init(options);
+  }
+  private createProgressBar(): HTMLDivElement {
+    const progressBar = document.createElement("div");
+    progressBar.className = "live-photo-progress";
+    progressBar.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: #fff;
+      transition: width 0.2s;
+      opacity: 0;
+    `;
+    return progressBar;
   }
 
   private createContainer(options: LivePhotoOptions): HTMLElement {
@@ -64,11 +87,22 @@ export class LivePhotoViewer {
     this.addPreventDefaultListeners(photo);
     return photo;
   }
+  private updateBadgeProgress(progress: number): void {
+    if (this.badge) {
+      const iconHtml = createProgressLiveIcon(progress);
+      // 保留原有的 LIVE 文本和箭头
+      this.badge.innerHTML = `
+        ${iconHtml}
+        <span class="live-text">LIVE</span>
+        <span class="chevron">${arrowIcon}</span>
+      `;
+    }
+  }
 
   private createVideo(options: LivePhotoOptions): HTMLVideoElement {
     const video = document.createElement("video");
     const videoAttributes = {
-      src: options.videoSrc,
+      // src: options.videoSrc,
       loop: false,
       muted: true,
       playsInline: true,
@@ -79,9 +113,41 @@ export class LivePhotoViewer {
       video[key] = value;
     });
 
-    video.addEventListener("loadedmetadata", () => {
-      options.onCanPlay?.();
-      options.onVideoLoad?.();
+    // 只有在非延迟加载模式下才立即设置视频源
+    if (!options.lazyLoadVideo) {
+      video.src = options.videoSrc;
+    }
+
+    let lastProgress = 0;
+    video.addEventListener("progress", () => {
+      if (video.buffered.length > 0) {
+        const progress = Math.floor((video.buffered.end(0) / video.duration) * 100);
+        // 只在进度发生实际变化时更新
+        if (progress !== lastProgress) {
+          lastProgress = progress;
+          this.updateBadgeProgress(progress);
+          options.onProgress?.(progress);
+          
+          // 加载完成后恢复原始图标
+          if (progress >= 100) {
+            setTimeout(() => {
+              this.badge.innerHTML = `
+                ${this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay}
+                <span class="live-text">LIVE</span>
+                <span class="chevron">${arrowIcon}</span>
+              `;
+            }, 500);
+          }
+        }
+      }
+    });
+
+    // 添加更多进度事件监听
+    video.addEventListener("loadeddata", () => {
+      if (video.buffered.length > 0) {
+        const progress = Math.floor((video.buffered.end(0) / video.duration) * 100);
+        this.updateBadgeProgress(progress);
+      }
     });
 
     video.addEventListener("ended", () => this.handleVideoEnd(options));
@@ -112,7 +178,7 @@ export class LivePhotoViewer {
   private createBadge(): HTMLDivElement {
     const badge = document.createElement("div");
     badge.className = "live-photo-badge";
-    badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
+    badge.innerHTML = this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay;
 
     const span = document.createElement("span");
     const spanChevron = document.createElement("span");
@@ -141,7 +207,7 @@ export class LivePhotoViewer {
       const button = document.getElementById("toggle-autoplay");
       if (button) {
         button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
-        this.badge.innerHTML = this.autoplay ? liveIcon : liveIconNoAutoPlay;
+        this.badge.innerHTML = this.autoplay ? createProgressLiveIcon(100) : liveIconNoAutoPlay;
         this.badge.innerHTML += `<span class="live-text">LIVE</span><span class="chevron">${arrowIcon}</span>`;
       }
       this.autoplay ? this.play() : this.stop();
@@ -223,6 +289,11 @@ export class LivePhotoViewer {
   public async play(): Promise<void> {
     if (!this.isPlaying && !this.videoError) {
       try {
+        if (!this.videoLoaded && !this.video.src) {
+          this.progressBar.style.opacity = "1";
+          this.updateBadgeProgress(0);
+          this.video.src = this.videoSrc;
+        }
         this.isPlaying = true;
         this.video.currentTime = 0;
         await this.video.play();
@@ -265,7 +336,6 @@ export class LivePhotoViewer {
   }
 
   private handleError(error: Error, callback?: (e?: any) => void): void {
-    console.error("LivePhotoViewer Error:", error);
     callback?.(error);
   }
 }

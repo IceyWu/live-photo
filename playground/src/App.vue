@@ -18,6 +18,10 @@ onMounted(() => {
       width: 300,
       height: 300,
       autoplay: false,
+      lazyLoadVideo: true, // 启用延迟加载
+      onProgress: (progress) => {
+        console.log(`视频加载进度: ${progress}%`);
+      },
       onCanPlay: () => {
         console.log("onCanPlay");
       },
