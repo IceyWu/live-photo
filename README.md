@@ -32,19 +32,21 @@ bun i live-photo
 
 ### Configuration Options
 
-| Parameter  | Type        | Required | Description                |
-|------------|-------------|----------|----------------------------|
-| photoSrc   | string      | Yes      | Image resource URL         |
-| videoSrc   | string      | Yes      | Video resource URL         |
-| container  | HTMLElement | Yes      | Container DOM element      |
-| width      | number      | No       | Viewer width (default: 300px) |
-| height     | number      | No       | Viewer height (default: 300px) |
-| autoplay   | boolean     | No       | Whether to autoplay (default: false) |
-| onCanPlay  | () => void  | No       | Callback when video can play |
-| onError    | (e?: any) => void | No | Callback on load error     |
-| onEnded    | () => void  | No       | Callback when video ends    |
-| onVideoLoad| () => void  | No       | Callback when video loads   |
-| onPhotoLoad| () => void  | No       | Callback when image loads    |
+| Parameter     | Type              | Required | Description                |
+|--------------|-------------------|----------|----------------------------|
+| photoSrc     | string           | Yes      | Image resource URL         |
+| videoSrc     | string           | Yes      | Video resource URL         |
+| container    | HTMLElement      | Yes      | Container DOM element      |
+| width        | number           | No       | Viewer width (default: 300px) |
+| height       | number           | No       | Viewer height (default: 300px) |
+| autoplay     | boolean          | No       | Whether to autoplay (default: false) |
+| lazyLoadVideo| boolean          | No       | Whether to lazy load video (default: false) |
+| onCanPlay    | () => void       | No       | Callback when video can play |
+| onError      | (e?: any) => void| No       | Callback on load error     |
+| onEnded      | () => void       | No       | Callback when video ends    |
+| onVideoLoad  | () => void       | No       | Callback when video loads   |
+| onPhotoLoad  | () => void       | No       | Callback when image loads   |
+| onProgress   | (progress: number) => void | No | Callback for video loading progress |
 
 ### Methods
 

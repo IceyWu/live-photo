@@ -32,19 +32,21 @@ bun i live-photo
 
 ### 配置选项
 
-| 参数      | 类型        | 必填 | 描述                    |
-| --------- | ----------- | ---- | ----------------------- |
-| photoSrc  | string      | 是   | 图片资源地址            |
-| videoSrc  | string      | 是   | 视频资源地址            |
-| container | HTMLElement | 是   | 容器 DOM 元素           |
-| width     | number      | 否   | 查看器宽度(默认: 300px) |
-| height    | number      | 否   | 查看器高度(默认: 300px) |
-| autoplay  | boolean     | 否   | 是否自动播放(默认: false) |
-| onCanPlay | () => void  | 否   | 视频可以播放时的回调    |
-| onError   | (e?: any) => void | 否 | 加载错误时的回调        |
-| onEnded   | () => void  | 否   | 视频播放结束时的回调    |
-| onVideoLoad | () => void | 否  | 视频加载完成时的回调    |
-| onPhotoLoad | () => void | 否  | 图片加载完成时的回调    |
+| 参数         | 类型              | 是否必填 | 描述                    |
+|--------------|-------------------|----------|------------------------|
+| photoSrc     | string           | 是       | 图片资源 URL           |
+| videoSrc     | string           | 是       | 视频资源 URL           |
+| container    | HTMLElement      | 是       | 容器 DOM 元素          |
+| width        | number           | 否       | 查看器宽度（默认：300px）|
+| height       | number           | 否       | 查看器高度（默认：300px）|
+| autoplay     | boolean          | 否       | 是否自动播放（默认：false）|
+| lazyLoadVideo| boolean          | 否       | 是否延迟加载视频（默认：false）|
+| onCanPlay    | () => void       | 否       | 视频可以播放时的回调    |
+| onError      | (e?: any) => void| 否       | 加载错误时的回调        |
+| onEnded      | () => void       | 否       | 视频播放结束时的回调    |
+| onVideoLoad  | () => void       | 否       | 视频加载完成时的回调    |
+| onPhotoLoad  | () => void       | 否       | 图片加载完成时的回调    |
+| onProgress   | (progress: number) => void | 否 | 视频加载进度回调    |
 
 ### 抛出方法
 
