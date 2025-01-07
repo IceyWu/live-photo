@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.45
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.44...v0.0.45)
+
+### 🚀 Enhancements
+
+- 更新 LivePhotoViewer 组件，支持宽度和高度为字符串类型 ([7b87225](https://github.com/iceywu/live-photo/commit/7b87225))
+- 更新 LivePhotoViewer 组件，支持动态容器尺寸调整和自适应宽高比 ([38e5fa1](https://github.com/iceywu/live-photo/commit/38e5fa1))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](http://github.com/Life-Palette))
+
 ## v0.0.44
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.43...v0.0.44)
