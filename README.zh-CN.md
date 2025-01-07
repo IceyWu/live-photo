@@ -47,8 +47,8 @@ bun i live-photo
 | photoSrc           | string                     | 是       | 图片资源 URL                    |
 | videoSrc           | string                     | 是       | 视频资源 URL                    |
 | container          | HTMLElement                | 是       | 容器 DOM 元素                   |
-| width              | number                     | 否       | 查看器宽度（默认：300px）       |
-| height             | number                     | 否       | 查看器高度（默认：300px）       |
+| width              | number｜string             | 否       | 查看器宽度（默认：300px）       |
+| height             | number｜string             | 否       | 查看器高度（默认：300px）       |
 | autoplay           | boolean                    | 否       | 是否自动播放（默认：false）     |
 | lazyLoadVideo      | boolean                    | 否       | 是否延迟加载视频（默认：false） |
 | imageCustomization | ElementCustomization       | 否       | 图片元素的自定义配置            |

@@ -10,8 +10,8 @@ export interface LivePhotoOptions {
   photoSrc: string;
   videoSrc: string;
   container: HTMLElement;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   autoplay?: boolean;
   lazyLoadVideo?: boolean;
   imageCustomization?: ElementCustomization; // 图片自定义配置
@@ -78,8 +78,13 @@ export class LivePhotoViewer {
   private createContainer(options: LivePhotoOptions): HTMLElement {
     const container = document.createElement("div");
     container.className = "live-photo-container";
-    container.style.width = `${options.width || 300}px`;
-    container.style.height = `${options.height || 300}px`;
+    
+    const width = options.width || 300;
+    const height = options.height || 300;
+    
+    container.style.width = typeof width === 'number' ? `${width}px` : width;
+    container.style.height = typeof height === 'number' ? `${height}px` : height;
+    
     return container;
   }
 
@@ -385,7 +390,7 @@ export class LivePhotoViewer {
     if (this.isPlaying) {
       this.isPlaying = false;
       this.video.pause();
-      this.video.currentTime = 0;
+      // this.video.currentTime = 0;
       this.container.classList.remove("playing");
       this.photo.style.opacity = "1";
     }

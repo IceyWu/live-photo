@@ -48,8 +48,8 @@ bun i live-photo
 | photoSrc           | string                     | Yes      | Image resource URL                          |
 | videoSrc           | string                     | Yes      | Video resource URL                          |
 | container          | HTMLElement                | Yes      | Container DOM element                       |
-| width              | number                     | No       | Viewer width (default: 300px)               |
-| height             | number                     | No       | Viewer height (default: 300px)              |
+| width              | number｜string             | No       | Viewer width (default: 300px)               |
+| height             | number｜string             | No       | Viewer height (default: 300px)              |
 | autoplay           | boolean                    | No       | Whether to autoplay (default: false)        |
 | lazyLoadVideo      | boolean                    | No       | Whether to lazy load video (default: false) |
 | imageCustomization | ElementCustomization       | No       | Image element customization                 |

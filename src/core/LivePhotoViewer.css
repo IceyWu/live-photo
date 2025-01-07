@@ -14,17 +14,19 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.3s ease, transform 0.3s ease; /* 缩短过渡时间 */
-  backface-visibility: hidden; /* 添加性能优化 */
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .live-photo-video {
-  transition: opacity 0.5s ease, transform 0.5s ease;
   opacity: 0;
-  transform: scale(1);
+  transform: scale(1.02);  /* 初始稍微放大 */
 }
-..live-photo-image {
+
+.live-photo-image {
   opacity: 1;
+  transform: scale(1);
 }
 
 .live-photo-badge {
@@ -123,14 +125,13 @@
 }
 
 .live-photo-container.playing .live-photo-video {
-  display: block;
   opacity: 1;
-  transform: scale(1.05);
+  transform: scale(1.05);    /* 播放时恢复正常大小 */
 }
 
 .live-photo-container.playing .live-photo-image {
-  /* display: none; */
   opacity: 0;
+  transform: scale(0.98);  /* 淡出时稍微缩小 */
 }
 
 .live-photo-badge svg {
