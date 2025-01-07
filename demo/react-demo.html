@@ -35,8 +35,8 @@
             photoSrc: demoSource.photoSrc,
             videoSrc: demoSource.videoSrc,
             container: containerRef.current,
-            width: 300,
-            height: 300,
+            // width: 300,
+            height: "100%",
             imageCustomization: {
               styles: {
                 objectFit: "cover",
@@ -50,7 +50,7 @@
           });
         }, []);
 
-        return <div ref={containerRef}></div>;
+        return <div style={{ height: "40vh" }} ref={containerRef}></div>;
       };
 
       const root = ReactDOM.createRoot(document.getElementById("react-demo"));

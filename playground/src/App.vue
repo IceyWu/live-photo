@@ -3,9 +3,9 @@ import { LivePhotoViewer } from "../../src/index";
 import { ref, onMounted } from "vue";
 const demoSource = {
   photoSrc:
-    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1735895958950.jpg",
   videoSrc:
-    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
+    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1735895959622.mp4",
 };
 const containerRef = ref<HTMLElement | null>(null);
 
@@ -15,31 +15,33 @@ onMounted(() => {
       photoSrc: demoSource.photoSrc,
       videoSrc: demoSource.videoSrc,
       container: containerRef.value,
-      width: 300,
-      height: 300,
+      // width: "100%",
+      height: "100%",
+      // width: "30vw",
+      // height: "30vw",
       // autoplay: false,
-      // lazyLoadVideo: true, // 启用延迟加载 
-      imageCustomization: {
-        styles: {
-          objectFit: "cover",
-          borderRadius: "8px",
-          filter: "brightness(1.1)",
-        },
-        attributes: {
-          alt: "Live Photo",
-          loading: "lazy",
-        },
-      },
-      videoCustomization: {
-        styles: {
-          objectFit: "contain",
-          borderRadius: "8px",
-        },
-        attributes: {
-          preload: "metadata",
-          controlsList: "nodownload",
-        },
-      },
+      // lazyLoadVideo: true, // 启用延迟加载
+      // imageCustomization: {
+      //   styles: {
+      //     objectFit: "cover",
+      //     borderRadius: "8px",
+      //     filter: "brightness(1.1)",
+      //   },
+      //   attributes: {
+      //     alt: "Live Photo",
+      //     loading: "lazy",
+      //   },
+      // },
+      // videoCustomization: {
+      //   styles: {
+      //     objectFit: "contain",
+      //     borderRadius: "8px",
+      //   },
+      //   attributes: {
+      //     preload: "metadata",
+      //     controlsList: "nodownload",
+      //   },
+      // },
       onProgress: (progress) => {
         console.log(`视频加载进度: ${progress}%`);
       },
@@ -67,7 +69,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="containerRef"></div>
+  <div>
+    <div style="height: 40vh" ref="containerRef"></div>
+  </div>
 </template>
 
 <style scoped>

@@ -28,12 +28,12 @@
               photoSrc: demoSource.photoSrc,
               videoSrc: demoSource.videoSrc,
               container: containerRef.value,
-              width: 300,
-              height: 300,
+              // width: 300,
+              height: "100%",
               imageCustomization: {
                 styles: {
                   objectFit: "cover",
-                  borderRadius: "8px",
+                  // borderRadius: "8px",
                 },
                 attributes: {
                   alt: "Live Photo Demo",
@@ -45,7 +45,7 @@
 
           return { containerRef };
         },
-        template: '<div ref="containerRef"></div>',
+        template: '<div style="height: 40vh;" ref="containerRef"></div>',
       };
 
       createApp(App).mount("#vue3-demo");

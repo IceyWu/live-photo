@@ -34,7 +34,7 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  left: 16px;
+  left: 12px;
   top: 16px;
   z-index: 10;
   background: rgba(64, 64, 64, 0.5); /* 提高默认对比度 */
@@ -94,7 +94,7 @@
   display: none; 
   position: absolute;
   top: 50px;
-  left: 16px;
+  left: 12px;
 
   padding: 5px;
   color: #fff;

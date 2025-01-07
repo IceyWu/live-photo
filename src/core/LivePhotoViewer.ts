@@ -37,6 +37,7 @@ export class LivePhotoViewer {
   private touchTimeout?: number;
   private videoLoaded: boolean = false; // 新增：标记视频是否已加载
   private videoSrc?: string = "";
+  private aspectRatio: number = 1; // 新增：存储图片实际宽高比
 
   constructor(options: LivePhotoOptions) {
     this.autoplay = options.autoplay ?? true;
@@ -79,11 +80,22 @@ export class LivePhotoViewer {
     const container = document.createElement("div");
     container.className = "live-photo-container";
     
-    const width = options.width || 300;
-    const height = options.height || 300;
+    // 先设置已知的尺寸
+    if (options.width) {
+      const width = typeof options.width === 'number' ? `${options.width}px` : options.width;
+      container.style.width = width;
+    }
     
-    container.style.width = typeof width === 'number' ? `${width}px` : width;
-    container.style.height = typeof height === 'number' ? `${height}px` : height;
+    if (options.height) {
+      const height = typeof options.height === 'number' ? `${options.height}px` : options.height;
+      container.style.height = height;
+    }
+
+    // 如果都没设置，使用默认值
+    if (!options.width && !options.height) {
+      container.style.width = '300px';
+      container.style.height = '300px';
+    }
     
     return container;
   }
@@ -92,6 +104,13 @@ export class LivePhotoViewer {
     const photo = new Image();
     photo.src = options.photoSrc;
     photo.className = "live-photo-image";
+
+    // 图片加载完成后获取实际宽高比并更新容器尺寸
+    photo.addEventListener("load", () => {
+      this.aspectRatio = photo.naturalWidth / photo.naturalHeight;
+      this.updateContainerSize();
+      options.onPhotoLoad?.();
+    });
 
     // 应用自定义样式和属性
     if (options.imageCustomization) {
@@ -110,7 +129,6 @@ export class LivePhotoViewer {
       }
     }
 
-    photo.addEventListener("load", () => options.onPhotoLoad?.());
     photo.addEventListener("error", () =>
       options.onError?.(new Error("Photo load error"))
     );
@@ -398,6 +416,24 @@ export class LivePhotoViewer {
 
   private handleError(error: Error, callback?: (e?: any) => void): void {
     callback?.(error);
+  }
+
+  // 新增：更新容器尺寸的方法
+  private updateContainerSize(): void {
+    // 获取当前容器的计算样式
+    const computedStyle = window.getComputedStyle(this.container);
+    const currentWidth = parseFloat(computedStyle.width);
+    const currentHeight = parseFloat(computedStyle.height);
+
+    // 只设置了宽度，根据宽高比计算高度
+    if (this.container.style.width && !this.container.style.height) {
+      this.container.style.height = `${currentWidth / this.aspectRatio}px`;
+    }
+    
+    // 只设置了高度，根据宽高比计算宽度
+    if (this.container.style.height && !this.container.style.width) {
+      this.container.style.width = `${currentHeight * this.aspectRatio}px`;
+    }
   }
 }
 

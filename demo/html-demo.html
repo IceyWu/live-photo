@@ -8,7 +8,7 @@
     <!-- <script src="../dist/LivePhotoViewer.js"></script> -->
   </head>
   <body>
-    <div id="live-photo-container"></div>
+    <div style="height: 40vh;" id="live-photo-container"></div>
     <script>
       const demoSource = {
         photoSrc:
@@ -22,8 +22,8 @@
           photoSrc: demoSource.photoSrc,
           videoSrc: demoSource.videoSrc,
           container: container,
-          width: 300,
-          height: 300,
+          // width: 300,
+          height: "100%",
           imageCustomization: {
             styles: {
               objectFit: "cover",
