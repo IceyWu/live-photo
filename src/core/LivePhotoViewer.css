@@ -25,6 +25,7 @@
 }
 
 .live-photo-image {
+  -webkit-touch-callout: none;
   opacity: 1;
   transform: scale(1);
 }

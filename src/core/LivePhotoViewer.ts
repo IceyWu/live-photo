@@ -38,6 +38,7 @@ export class LivePhotoViewer {
   private videoLoaded: boolean = false; // 新增：标记视频是否已加载
   private videoSrc?: string = "";
   private aspectRatio: number = 1; // 新增：存储图片实际宽高比
+  private isLongPressPlaying: boolean = false; // 新增：标记是否由长按触发的播放
 
   constructor(options: LivePhotoOptions) {
     this.autoplay = options.autoplay ?? true;
@@ -228,6 +229,7 @@ export class LivePhotoViewer {
     if (!this.video.loop) {
       this.stop();
       this.isPlaying = false;
+      this.isLongPressPlaying = false; // 重置长按标记
       this.container.classList.remove("playing");
       options.onEnded?.();
     }
@@ -308,7 +310,9 @@ export class LivePhotoViewer {
 
   private handleTouchStart(): void {
     this.touchTimeout = setTimeout(() => {
-      if (!this.autoplay && !this.videoError) {
+      // 移动端长按播放，标记为长按触发
+      if (!this.videoError && !this.isPlaying) {
+        this.isLongPressPlaying = true;
         this.play();
       }
     }, 500); // 长按 500ms
@@ -316,7 +320,9 @@ export class LivePhotoViewer {
 
   private handleTouchEnd(): void {
     clearTimeout(this.touchTimeout);
-    if (!this.autoplay && !this.videoError) {
+    // 只有当播放是由长按触发时，松手才停止播放
+    if (this.isLongPressPlaying && !this.videoError && this.isPlaying) {
+      this.isLongPressPlaying = false;
       this.stop();
     }
   }
