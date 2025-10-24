@@ -12,7 +12,8 @@
       "import": "./dist/LivePhotoViewer.esm.js",
       "require": "./dist/LivePhotoViewer.cjs.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./dist/LivePhotoViewer.css": "./dist/LivePhotoViewer.css"
   },
   "files": [
     "dist"
