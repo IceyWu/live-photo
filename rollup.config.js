@@ -10,6 +10,9 @@ export default {
       name: 'LivePhotoViewer',
       sourcemap: true,
       exports: 'named',
+      globals: {
+        tslib: 'tslib',
+      },
     },
     {
       file: 'dist/LivePhotoViewer.esm.js',
@@ -23,9 +26,22 @@ export default {
       exports: 'named',
     },
   ],
+  external: ['tslib'],
   plugins: [
-    typescript({ tsconfig: './tsconfig.json' }),
-    postcss(),
+    typescript({
+      tsconfig: './tsconfig.json',
+      declaration: true,
+      declarationMap: true,
+    }),
+    postcss({
+      minimize: true,
+      inject: false,
+      extract: false,
+    }),
   ],
+  treeshake: {
+    moduleSideEffects: false,
+    propertyReadSideEffects: false,
+  },
 };
 
