@@ -1,9 +1,36 @@
+:root {
+  --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
+  --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
+  --live-photo-text-color: #fff;
+  --live-photo-border-radius: 12px;
+  --live-photo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --live-photo-progress-height: 3px;
+  --live-photo-progress-color: #fff;
+  --live-photo-dropdown-bg: rgba(64, 64, 64, 0.25);
+  --live-photo-dropdown-button-hover: rgba(64, 64, 64, 0.5);
+}
+
+[data-theme="dark"] {
+  --live-photo-badge-bg: rgba(32, 32, 32, 0.7);
+  --live-photo-badge-hover-bg: rgba(32, 32, 32, 0.9);
+  --live-photo-dropdown-bg: rgba(32, 32, 32, 0.5);
+  --live-photo-dropdown-button-hover: rgba(32, 32, 32, 0.7);
+}
+
+[data-theme="light"] {
+  --live-photo-badge-bg: rgba(255, 255, 255, 0.7);
+  --live-photo-badge-hover-bg: rgba(255, 255, 255, 0.9);
+  --live-photo-text-color: #000;
+  --live-photo-dropdown-bg: rgba(255, 255, 255, 0.5);
+  --live-photo-dropdown-button-hover: rgba(255, 255, 255, 0.7);
+}
+
 .live-photo-container {
   position: relative;
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;
-  will-change: transform; /* 添加性能优化 */
+  will-change: transform;
 }
 
 .live-photo-image,
@@ -38,14 +65,14 @@
   left: 12px;
   top: 16px;
   z-index: 10;
-  background: rgba(64, 64, 64, 0.5); /* 提高默认对比度 */
-  border-radius: 12px;
-  color: #fff;
+  background: var(--live-photo-badge-bg);
+  border-radius: var(--live-photo-border-radius);
+  color: var(--live-photo-text-color);
   cursor: pointer;
   height: 24px;
-  padding: 0 8px; /* 增加内边距提高可点击区域 */
+  padding: 0 8px;
   box-sizing: border-box;
-  transition: all 0.3s;
+  transition: all var(--live-photo-transition);
 }
 
 .live-photo-badge .live-icon {
@@ -96,33 +123,31 @@
   position: absolute;
   top: 50px;
   left: 12px;
-
   padding: 5px;
-  color: #fff;
-
+  color: var(--live-photo-text-color);
   -webkit-backdrop-filter: saturate(150%) blur(10px);
   backdrop-filter: saturate(150%) blur(10px);
-  background: rgba(64, 64, 64, 0.25);
-  border-radius: 12px;
-  color: #fff;
+  background: var(--live-photo-dropdown-bg);
+  border-radius: var(--live-photo-border-radius);
   cursor: pointer;
 }
+
 .dropdown-menu.show {
   display: block;
 }
 
 .dropdown-menu button {
-  color: #fff;
+  color: var(--live-photo-text-color);
   border: none;
   border-radius: 4px;
   padding: 5px 10px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background var(--live-photo-transition);
   background: none;
 }
 
 .dropdown-menu button:hover {
-  background: rgba(64, 64, 64, 0.5);
+  background: var(--live-photo-dropdown-button-hover);
 }
 
 .live-photo-container.playing .live-photo-video {
@@ -146,4 +171,16 @@
 /* 确保图标在加载时保持清晰 */
 .live-photo-badge svg circle {
   vector-effect: non-scaling-stroke;
+}
+
+/* Progress bar */
+.live-photo-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: var(--live-photo-progress-height);
+  background: var(--live-photo-progress-color);
+  transition: width 0.2s;
+  opacity: 0;
 }

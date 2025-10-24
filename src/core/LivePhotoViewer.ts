@@ -1,459 +1,389 @@
 import "./LivePhotoViewer.css";
-import { arrowIcon, errorIcon, createProgressLiveIcon } from "./icons";
+import type { LivePhotoOptions, LivePhotoAPI, LivePhotoState, LivePhotoError } from '../types';
+import { StateManager } from './StateManager';
+import { EventManager } from './EventManager';
+import { VideoLoader } from './VideoLoader';
+import { UIComponents } from './UIComponents';
+import { validateOptions } from '../utils/validators';
+import { debounce } from '../utils/debounce';
+import { isMobile, createLivePhotoError } from '../utils/helpers';
+import { errorIcon } from './icons';
 
-export interface ElementCustomization {
-  attributes?: { [key: string]: string }; // HTML 属性
-  styles?: { [key: string]: string }; // CSS 样式
-}
-
-export interface LivePhotoOptions {
-  photoSrc: string;
-  videoSrc: string;
-  container: HTMLElement;
-  width?: number | string;
-  height?: number | string;
-  autoplay?: boolean;
-  lazyLoadVideo?: boolean;
-  longPressDelay?: number; // 长按触发延迟时间（ms），用于区分短按（点击）与长按，默认 300ms
-  imageCustomization?: ElementCustomization; // 图片自定义配置
-  videoCustomization?: ElementCustomization; // 视频自定义配置
-  onCanPlay?: () => void;
-  onClick?: () => void; // 点击（短按）回调
-  onError?: (e?: any) => void;
-  onEnded?: () => void;
-  onVideoLoad?: () => void;
-  onPhotoLoad?: () => void;
-  onProgress?: (progress: number) => void;
-}
-
-export class LivePhotoViewer {
+export class LivePhotoViewer implements LivePhotoAPI {
+  private readonly stateManager: StateManager;
+  private readonly eventManager: EventManager;
+  private readonly videoLoader: VideoLoader;
+  
+  private readonly container: HTMLElement;
   private readonly photo: HTMLImageElement;
   private readonly video: HTMLVideoElement;
-  private readonly container: HTMLElement;
   private readonly badge: HTMLDivElement;
   private readonly dropMenu: HTMLDivElement;
-  private readonly progressBar: HTMLDivElement; // 新增：进度条元素
-  private isPlaying: boolean = false;
-  private autoplay: boolean = false;
-  private videoError: boolean = false;
-  private videoLoaded: boolean = false; // 新增：标记视频是否已加载
-  private videoSrc?: string = "";
-  private aspectRatio: number = 1; // 新增：存储图片实际宽高比
-  private isLongPressPlaying: boolean = false; // 新增：标记是否由长按触发的播放
-  private longPressDelay: number = 300; // 长按触发延迟时间，默认 300ms
-  private touchStartTime: number = 0; // 记录触摸开始时间
-  private readonly options: LivePhotoOptions; // 保存配置选项
+  private readonly progressBar: HTMLDivElement;
+  
+  private readonly options: LivePhotoOptions;
+  private touchStartTime: number = 0;
+  private intersectionObserver?: IntersectionObserver;
+  private videoSrc: string;
+  private aspectRatio: number = 1;
 
   constructor(options: LivePhotoOptions) {
-    this.options = options;
-    this.autoplay = options.autoplay ?? true;
-    this.longPressDelay = options.longPressDelay ?? 300;
-    this.container = this.createContainer(options);
-    this.photo = this.createPhoto(options);
-    this.video = this.createVideo(options);
-    this.badge = this.createBadge();
-    this.dropMenu = this.createDropMenu();
-    this.progressBar = this.createProgressBar();
-    this.container.appendChild(this.progressBar);
+    // Validate options
+    validateOptions(options);
+    
+    // Set default options
+    this.options = {
+      autoplay: true,
+      lazyLoadVideo: false,
+      longPressDelay: 300,
+      retryAttempts: 3,
+      enableVibration: true,
+      ...options,
+    };
 
+    // Initialize managers
+    this.stateManager = new StateManager({
+      autoplay: this.options.autoplay,
+    });
+    
+    this.eventManager = new EventManager();
+    this.videoLoader = new VideoLoader(this.options.retryAttempts);
+
+    // Store video source
+    this.videoSrc = this.options.videoSrc;
+
+    // Create UI components
+    this.container = UIComponents.createContainer(this.options);
+    this.photo = UIComponents.createPhoto(this.options.photoSrc, this.options.imageCustomization);
+    this.video = UIComponents.createVideo(
+      this.options.videoSrc,
+      this.options.lazyLoadVideo ?? false,
+      this.options.videoCustomization
+    );
+    this.badge = UIComponents.createBadge(this.options.autoplay ?? true);
+    this.dropMenu = UIComponents.createDropMenu(this.options.autoplay ?? true);
+    this.progressBar = UIComponents.createProgressBar();
+
+    // Assemble DOM
+    this.assembleDOM();
+    
+    // Setup event listeners
+    this.setupEventListeners();
+    
+    // Initialize
+    this.initialize();
+  }
+
+  private assembleDOM(): void {
+    this.container.appendChild(this.progressBar);
     this.container.appendChild(this.photo);
     this.container.appendChild(this.video);
     this.container.appendChild(this.badge);
     this.container.appendChild(this.dropMenu);
-    options.container.appendChild(this.container);
-
-    this.videoSrc = options.videoSrc || "";
-
-    this.init(options);
-  }
-  private createProgressBar(): HTMLDivElement {
-    const progressBar = document.createElement("div");
-    progressBar.className = "live-photo-progress";
-    progressBar.style.cssText = `
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0%;
-      height: 3px;
-      background: #fff;
-      transition: width 0.2s;
-      opacity: 0;
-    `;
-    return progressBar;
+    this.options.container.appendChild(this.container);
   }
 
-  private createContainer(options: LivePhotoOptions): HTMLElement {
-    const container = document.createElement("div");
-    container.className = "live-photo-container";
-    
-    // 先设置已知的尺寸
-    if (options.width) {
-      const width = typeof options.width === 'number' ? `${options.width}px` : options.width;
-      container.style.width = width;
-    }
-    
-    if (options.height) {
-      const height = typeof options.height === 'number' ? `${options.height}px` : options.height;
-      container.style.height = height;
-    }
+  private setupEventListeners(): void {
+    // Photo events
+    this.eventManager.addEventListener(this.photo, 'load', this.handlePhotoLoad.bind(this));
+    this.eventManager.addEventListener(this.photo, 'error', this.handlePhotoError.bind(this));
 
-    // 如果都没设置，使用默认值
-    if (!options.width && !options.height) {
-      container.style.width = '300px';
-      container.style.height = '300px';
-    }
-    
-    return container;
-  }
+    // Video events
+    this.eventManager.addEventListener(this.video, 'ended', this.handleVideoEnd.bind(this));
+    this.eventManager.addEventListener(this.video, 'error', this.handleVideoError.bind(this));
+    this.eventManager.addEventListener(this.video, 'progress', debounce(this.handleVideoProgress.bind(this), 100));
+    this.eventManager.addEventListener(this.video, 'loadeddata', this.handleVideoLoadedData.bind(this));
 
-  private createPhoto(options: LivePhotoOptions): HTMLImageElement {
-    const photo = new Image();
-    photo.src = options.photoSrc;
-    photo.className = "live-photo-image";
+    // Badge events
+    this.eventManager.addEventListener(this.badge, 'click', this.toggleDropMenu.bind(this));
 
-    // 图片加载完成后获取实际宽高比并更新容器尺寸
-    photo.addEventListener("load", () => {
-      this.aspectRatio = photo.naturalWidth / photo.naturalHeight;
-      this.updateContainerSize();
-      options.onPhotoLoad?.();
-    });
-
-    // 应用自定义样式和属性
-    if (options.imageCustomization) {
-      // 应用样式
-      if (options.imageCustomization.styles) {
-        for (const prop in options.imageCustomization.styles) {
-          photo.style[prop as any] = options.imageCustomization.styles[prop];
-        }
-      }
-
-      // 应用属性
-      if (options.imageCustomization.attributes) {
-        for (const key in options.imageCustomization.attributes) {
-          photo.setAttribute(key, options.imageCustomization.attributes[key]);
-        }
-      }
+    // Dropdown menu button
+    const toggleButton = this.dropMenu.querySelector('#toggle-autoplay');
+    if (toggleButton) {
+      this.eventManager.addEventListener(toggleButton as HTMLElement, 'click', this.handleToggleAutoplay.bind(this));
     }
 
-    photo.addEventListener("error", () =>
-      options.onError?.(new Error("Photo load error"))
-    );
-    this.addPreventDefaultListeners(photo);
-    return photo;
-  }
-  private updateBadgeProgress(progress: number): void {
-    if (this.badge) {
-      const iconHtml = createProgressLiveIcon(progress, !this.autoplay);
-
-      // 保留原有的 LIVE 文本和箭头
-      this.badge.innerHTML = `
-        ${iconHtml}
-        <span class="live-text">LIVE</span>
-        <span class="chevron">${arrowIcon}</span>
-      `;
+    // Interaction events
+    if (isMobile()) {
+      this.setupMobileEvents();
+    } else {
+      this.setupDesktopEvents();
     }
   }
 
-  private createVideo(options: LivePhotoOptions): HTMLVideoElement {
-    const video = document.createElement("video");
-    const defaultVideoAttributes = {
-      loop: false,
-      muted: true,
-      playsInline: true,
-      className: "live-photo-video",
-    };
+  private setupMobileEvents(): void {
+    this.eventManager.addEventListener(this.container, 'touchstart', this.handleTouchStart.bind(this));
+    this.eventManager.addEventListener(this.container, 'touchend', this.handleTouchEnd.bind(this));
+  }
 
-    // 应用默认属性
-    for (const key in defaultVideoAttributes) {
-      (video as any)[key] =
-        defaultVideoAttributes[key as keyof typeof defaultVideoAttributes];
-    }
-
-    // 应用自定义样式和属性
-    if (options.videoCustomization) {
-      // 应用样式
-      if (options.videoCustomization.styles) {
-        for (const prop in options.videoCustomization.styles) {
-          video.style[prop as any] = options.videoCustomization.styles[prop];
-        }
-      }
-
-      // 应用属性
-      if (options.videoCustomization.attributes) {
-        for (const key in options.videoCustomization.attributes) {
-          video.setAttribute(key, options.videoCustomization.attributes[key]);
-        }
-      }
-    }
-
-    // 只有在非延迟加载模式下才立即设置视频源
-    if (!options.lazyLoadVideo) {
-      video.src = options.videoSrc;
-    }
-
-    let lastProgress = 0;
-    video.addEventListener("progress", () => {
-      if (video.buffered.length > 0) {
-        const progress = Math.floor(
-          (video.buffered.end(0) / video.duration) * 100
-        );
-        // 只在进度发生实际变化时更新
-        if (progress !== lastProgress) {
-          lastProgress = progress;
-          this.updateBadgeProgress(progress);
-          options.onProgress?.(progress);
-
-          // 加载完成后恢复原始图标
-          if (progress >= 100) {
-            setTimeout(() => {
-              this.updateBadge();
-            }, 500);
-          }
-        }
+  private setupDesktopEvents(): void {
+    this.eventManager.addEventListener(this.badge, 'mouseenter', () => {
+      const state = this.stateManager.getState();
+      if (!state.videoError) {
+        this.play();
       }
     });
 
-    // 添加更多进度事件监听
-    video.addEventListener("loadeddata", () => {
-      if (video.buffered.length > 0) {
-        const progress = Math.floor(
-          (video.buffered.end(0) / video.duration) * 100
-        );
-        this.updateBadgeProgress(progress);
+    this.eventManager.addEventListener(this.badge, 'mouseleave', () => {
+      const state = this.stateManager.getState();
+      if (!state.videoError) {
+        this.stop();
       }
     });
-
-    video.addEventListener("ended", () => this.handleVideoEnd(options));
-    video.addEventListener("error", () => this.handleVideoError(options));
-
-    this.addPreventDefaultListeners(video);
-    return video;
   }
 
-  private handleVideoEnd(options: LivePhotoOptions): void {
+  private handlePhotoLoad(): void {
+    this.aspectRatio = this.photo.naturalWidth / this.photo.naturalHeight;
+    this.updateContainerSize();
+    this.options.onPhotoLoad?.();
+  }
+
+  private handlePhotoError(): void {
+    const error = createLivePhotoError('PHOTO_LOAD_ERROR', 'Failed to load photo');
+    this.options.onError?.(error);
+  }
+
+  private handleVideoEnd(): void {
     if (!this.video.loop) {
       this.stop();
-      this.isPlaying = false;
-      this.isLongPressPlaying = false; // 重置长按标记
-      this.container.classList.remove("playing");
-      options.onEnded?.();
+      this.stateManager.setState({ 
+        isPlaying: false, 
+        isLongPressPlaying: false 
+      });
+      this.container.classList.remove('playing');
+      this.options.onEnded?.();
     }
   }
 
-  private handleVideoError(options: LivePhotoOptions): void {
-    this.video.style.display = "none";
-    this.videoError = true;
+  private handleVideoError(): void {
+    this.video.style.display = 'none';
+    this.stateManager.setState({ videoError: true });
     this.badge.innerHTML = errorIcon;
-    this.container.classList.remove("playing");
-    this.handleError(new Error("Video load error"), options.onError);
+    this.container.classList.remove('playing');
+    
+    const error = createLivePhotoError('VIDEO_LOAD_ERROR', 'Failed to load video');
+    this.options.onError?.(error);
   }
 
-  private createBadge(): HTMLDivElement {
-    const badge = document.createElement("div");
-    badge.className = "live-photo-badge";
-    badge.innerHTML = createProgressLiveIcon(100, !this.autoplay);
+  private handleVideoProgress(): void {
+    if (this.video.buffered.length > 0) {
+      const progress = Math.floor((this.video.buffered.end(0) / this.video.duration) * 100);
+      const state = this.stateManager.getState();
+      
+      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay);
+      this.options.onProgress?.(progress);
 
-    const span = document.createElement("span");
-    const spanChevron = document.createElement("span");
-    span.className = "live-text";
-    span.innerText = "LIVE";
-    spanChevron.className = "chevron";
-    spanChevron.innerHTML = arrowIcon;
-    badge.appendChild(span);
-    badge.appendChild(spanChevron);
-
-    badge.style.transition = "width 0.3s";
-    badge.addEventListener("click", () => {
-      this.toggleAutoplay();
-    });
-
-    return badge;
-  }
-  private createDropMenu(): HTMLDivElement {
-    const controlButton = document.createElement("div");
-    controlButton.className = "dropdown-menu";
-    const ctrBtn = document.createElement("button");
-    ctrBtn.id = "toggle-autoplay";
-    ctrBtn.innerHTML = this.autoplay ? "关闭自动播放" : "开启自动播放";
-    controlButton.append(ctrBtn);
-
-    ctrBtn?.addEventListener("click", (e) => {
-      e.stopPropagation();
-
-      this.autoplay = !this.autoplay;
-      const button = document.getElementById("toggle-autoplay");
-      if (button) {
-        button.textContent = this.autoplay ? "关闭自动播放" : "开启自动播放";
-        this.updateBadge();
+      // Restore badge after loading complete
+      if (progress >= 100) {
+        setTimeout(() => {
+          UIComponents.updateBadgeContent(this.badge, 100, state.autoplay);
+        }, 500);
       }
-      this.toggleAutoplay();
-      this.autoplay ? this.play() : this.stop();
-    });
-
-    return controlButton;
-  }
-
-  private updateBadge(): void {
-    this.badge.innerHTML = `
-        ${createProgressLiveIcon(100, !this.autoplay)}
-        <span class="live-text">LIVE</span>
-        <span class="chevron">${arrowIcon}</span>
-    `;
-  }
-
-  private toggleAutoplay(): void {
-    if (this.dropMenu.classList.contains("show")) {
-      this.dropMenu.classList.remove("show");
-    } else {
-      this.dropMenu.classList.add("show");
     }
   }
 
-  private isMobile(): boolean {
-    return /Mobi|Android/i.test(navigator.userAgent);
+  private handleVideoLoadedData(): void {
+    if (this.video.buffered.length > 0) {
+      const progress = Math.floor((this.video.buffered.end(0) / this.video.duration) * 100);
+      const state = this.stateManager.getState();
+      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay);
+    }
+  }
+
+  private toggleDropMenu(): void {
+    this.dropMenu.classList.toggle('show');
+  }
+
+  private handleToggleAutoplay(e: Event): void {
+    e.stopPropagation();
+    
+    const state = this.stateManager.getState();
+    const newAutoplay = !state.autoplay;
+    
+    this.stateManager.setState({ autoplay: newAutoplay });
+    
+    const button = this.dropMenu.querySelector('#toggle-autoplay');
+    if (button) {
+      button.textContent = newAutoplay ? '关闭自动播放' : '开启自动播放';
+    }
+    
+    UIComponents.updateBadgeContent(this.badge, 100, newAutoplay);
+    this.toggleDropMenu();
+    
+    if (newAutoplay) {
+      this.play();
+    } else {
+      this.stop();
+    }
   }
 
   private handleTouchStart(): void {
     this.touchStartTime = Date.now();
     
-    // 直接开始播放（无延时）
-    if (!this.videoError && !this.isPlaying) {
-      this.isLongPressPlaying = true;
+    const state = this.stateManager.getState();
+    if (!state.videoError && !state.isPlaying) {
+      this.stateManager.setState({ isLongPressPlaying: true });
       this.play();
     }
   }
 
   private handleTouchEnd(): void {
     const touchDuration = Date.now() - this.touchStartTime;
+    const longPressDelay = this.options.longPressDelay ?? 300;
     
-    // 判断是短按还是长按
-    if (touchDuration < this.longPressDelay) {
-      // 短按（点击）- 触发 onClick 回调
+    // Short press (click)
+    if (touchDuration < longPressDelay) {
       this.options.onClick?.();
     }
     
-    // 停止播放（无论长按还是短按）
-    if (this.isLongPressPlaying && !this.videoError && this.isPlaying) {
-      this.isLongPressPlaying = false;
+    // Stop playback
+    const state = this.stateManager.getState();
+    if (state.isLongPressPlaying && !state.videoError && state.isPlaying) {
+      this.stateManager.setState({ isLongPressPlaying: false });
       this.stop();
     }
   }
 
-  private init(options: LivePhotoOptions): void {
-    if (this.autoplay) {
+  private initialize(): void {
+    const state = this.stateManager.getState();
+    
+    // Setup lazy loading if enabled
+    if (this.options.lazyLoadVideo) {
+      this.setupLazyLoading();
+    }
+    
+    // Autoplay if enabled
+    if (state.autoplay) {
       this.play();
     }
+  }
 
-    if (this.isMobile()) {
-      this.container.addEventListener(
-        "touchstart",
-        this.handleTouchStart.bind(this)
-      );
-      this.container.addEventListener(
-        "touchend",
-        this.handleTouchEnd.bind(this)
-      );
-    } else {
-      this.badge.addEventListener("mouseenter", () => {
-        if (!this.videoError) {
-          this.play();
+  private setupLazyLoading(): void {
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !this.video.src) {
+          this.options.onLoadStart?.();
+          this.video.src = this.videoSrc;
+          this.stateManager.setState({ videoLoaded: true });
+          this.intersectionObserver?.disconnect();
         }
       });
-
-      this.badge.addEventListener("mouseleave", () => {
-        if (!this.videoError) {
-          this.stop();
-        }
-      });
-    }
+    });
+    
+    this.intersectionObserver.observe(this.container);
   }
 
-  private addPreventDefaultListeners(element: HTMLElement): void {
-    element.style.userSelect = "none";
-    element.style.touchAction = "manipulation";
-    element.addEventListener("touchstart", this.preventDefault);
-    element.addEventListener("mousedown", this.preventDefault);
-    element.addEventListener("selectstart", this.preventDefault);
-    element.addEventListener("touchmove", this.preventDefault);
-    element.addEventListener("touchend", this.preventDefault);
-  }
-
-  private preventDefault(event: Event): void {
-    event.preventDefault();
-  }
-
-  public async play(): Promise<void> {
-    if (!this.isPlaying && !this.videoError) {
-      try {
-        if (!this.videoLoaded && !this.video.src) {
-          this.progressBar.style.opacity = "1";
-          this.updateBadgeProgress(0);
-          this.video.src = this.videoSrc ?? "";
-        }
-        this.isPlaying = true;
-        this.video.currentTime = 0;
-        this.updateBadge();
-        await this.video.play();
-
-        if (navigator.vibrate) {
-          navigator.vibrate(200);
-        }
-
-        requestAnimationFrame(() => {
-          this.container.classList.add("playing");
-          this.photo.style.opacity = "0";
-        });
-      } catch (error) {
-        this.handleError(error as Error);
-        this.stop();
-      }
-    }
-  }
-
-  public pause(): void {
-    if (this.isPlaying) {
-      this.isPlaying = false;
-      this.video.pause();
-      this.container.classList.remove("playing");
-    }
-  }
-
-  public toggle(): void {
-    this.isPlaying ? this.pause() : this.play();
-  }
-
-  public stop(): void {
-    if (this.isPlaying) {
-      this.isPlaying = false;
-      this.video.pause();
-      // this.video.currentTime = 0;
-      this.container.classList.remove("playing");
-      this.photo.style.opacity = "1";
-    }
-  }
-
-  private handleError(error: Error, callback?: (e?: any) => void): void {
-    callback?.(error);
-  }
-
-  // 新增：更新容器尺寸的方法
   private updateContainerSize(): void {
-    // 获取当前容器的计算样式
     const computedStyle = window.getComputedStyle(this.container);
     const currentWidth = parseFloat(computedStyle.width);
     const currentHeight = parseFloat(computedStyle.height);
 
-    // 只设置了宽度，根据宽高比计算高度
     if (this.container.style.width && !this.container.style.height) {
       this.container.style.height = `${currentWidth / this.aspectRatio}px`;
     }
     
-    // 只设置了高度，根据宽高比计算宽度
     if (this.container.style.height && !this.container.style.width) {
       this.container.style.width = `${currentHeight * this.aspectRatio}px`;
     }
   }
+
+  // Public API methods
+  public async play(): Promise<void> {
+    const state = this.stateManager.getState();
+    
+    if (state.isPlaying || state.videoError) {
+      return;
+    }
+
+    try {
+      // Load video if not loaded yet
+      if (!state.videoLoaded && !this.video.src) {
+        this.progressBar.style.opacity = '1';
+        UIComponents.updateBadgeContent(this.badge, 0, state.autoplay);
+        this.video.src = this.videoSrc;
+        this.stateManager.setState({ videoLoaded: true });
+      }
+
+      this.stateManager.setState({ isPlaying: true });
+      this.video.currentTime = 0;
+      UIComponents.updateBadgeContent(this.badge, 100, state.autoplay);
+      
+      await this.video.play();
+
+      // Haptic feedback
+      if (this.options.enableVibration && navigator.vibrate) {
+        navigator.vibrate(200);
+      }
+
+      requestAnimationFrame(() => {
+        this.container.classList.add('playing');
+        this.photo.style.opacity = '0';
+      });
+    } catch (error) {
+      const livePhotoError = createLivePhotoError(
+        'PLAYBACK_ERROR',
+        'Failed to play video',
+        error as Error
+      );
+      this.options.onError?.(livePhotoError);
+      this.stop();
+    }
+  }
+
+  public pause(): void {
+    const state = this.stateManager.getState();
+    
+    if (state.isPlaying) {
+      this.stateManager.setState({ isPlaying: false });
+      this.video.pause();
+      this.container.classList.remove('playing');
+    }
+  }
+
+  public stop(): void {
+    const state = this.stateManager.getState();
+    
+    if (state.isPlaying) {
+      this.stateManager.setState({ isPlaying: false });
+      this.video.pause();
+      this.container.classList.remove('playing');
+      this.photo.style.opacity = '1';
+    }
+  }
+
+  public toggle(): void {
+    const state = this.stateManager.getState();
+    state.isPlaying ? this.pause() : this.play();
+  }
+
+  public destroy(): void {
+    // Clean up intersection observer
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
+
+    // Clean up event listeners
+    this.eventManager.destroy();
+
+    // Clean up state manager
+    this.stateManager.destroy();
+
+    // Release media resources
+    this.video.pause();
+    this.video.src = '';
+    this.video.load();
+    this.photo.src = '';
+
+    // Remove from DOM
+    this.container.remove();
+  }
+
+  public getState(): Readonly<LivePhotoState> {
+    return this.stateManager.getState();
+  }
 }
 
 // Export to window object for browser use
-(window as any).LivePhotoViewer = LivePhotoViewer;
+if (typeof window !== 'undefined') {
+  window.LivePhotoViewer = LivePhotoViewer;
+}
