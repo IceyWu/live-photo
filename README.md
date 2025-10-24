@@ -52,9 +52,11 @@ bun i live-photo
 | height             | number｜string             | No       | Viewer height (default: 300px)              |
 | autoplay           | boolean                    | No       | Whether to autoplay (default: false)        |
 | lazyLoadVideo      | boolean                    | No       | Whether to lazy load video (default: false) |
+| longPressDelay     | number                     | No       | Long press threshold in ms (default: 300)   |
 | imageCustomization | ElementCustomization       | No       | Image element customization                 |
 | videoCustomization | ElementCustomization       | No       | Video element customization                 |
 | onCanPlay          | () => void                 | No       | Callback when video can play                |
+| onClick            | () => void                 | No       | Callback on click (short press)             |
 | onError            | (e?: any) => void          | No       | Callback on load error                      |
 | onEnded            | () => void                 | No       | Callback when video ends                    |
 | onVideoLoad        | () => void                 | No       | Callback when video loads                   |

@@ -1,1 +1,1 @@
-export { LivePhotoViewer, type LivePhotoOptions } from './core/LivePhotoViewer';
+export { LivePhotoViewer, type LivePhotoOptions, type ElementCustomization } from './core/LivePhotoViewer';

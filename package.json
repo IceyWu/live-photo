@@ -3,8 +3,16 @@
   "version": "0.0.46",
   "description": "A LivePhoto viewer for web applications",
   "author": "Icey Wu <3128006406@qq.com>",
-  "main": "dist/LivePhotoViewer.js",
-  "types": "dist/LivePhotoViewer.d.ts",
+  "main": "dist/LivePhotoViewer.cjs.js",
+  "module": "dist/LivePhotoViewer.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/LivePhotoViewer.esm.js",
+      "require": "./dist/LivePhotoViewer.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],

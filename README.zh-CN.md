@@ -51,9 +51,11 @@ bun i live-photo
 | height             | number｜string             | 否       | 查看器高度（默认：300px）       |
 | autoplay           | boolean                    | 否       | 是否自动播放（默认：false）     |
 | lazyLoadVideo      | boolean                    | 否       | 是否延迟加载视频（默认：false） |
+| longPressDelay     | number                     | 否       | 长按阈值（毫秒，默认：300）     |
 | imageCustomization | ElementCustomization       | 否       | 图片元素的自定义配置            |
 | videoCustomization | ElementCustomization       | 否       | 视频元素的自定义配置            |
 | onCanPlay          | () => void                 | 否       | 视频可以播放时的回调            |
+| onClick            | () => void                 | 否       | 点击（短按）时的回调            |
 | onError            | (e?: any) => void          | 否       | 加载错误时的回调                |
 | onEnded            | () => void                 | 否       | 视频播放结束时的回调            |
 | onVideoLoad        | () => void                 | 否       | 视频加载完成时的回调            |

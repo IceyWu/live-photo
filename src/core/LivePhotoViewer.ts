@@ -14,9 +14,11 @@ export interface LivePhotoOptions {
   height?: number | string;
   autoplay?: boolean;
   lazyLoadVideo?: boolean;
+  longPressDelay?: number; // 长按触发延迟时间（ms），用于区分短按（点击）与长按，默认 300ms
   imageCustomization?: ElementCustomization; // 图片自定义配置
   videoCustomization?: ElementCustomization; // 视频自定义配置
   onCanPlay?: () => void;
+  onClick?: () => void; // 点击（短按）回调
   onError?: (e?: any) => void;
   onEnded?: () => void;
   onVideoLoad?: () => void;
@@ -34,14 +36,18 @@ export class LivePhotoViewer {
   private isPlaying: boolean = false;
   private autoplay: boolean = false;
   private videoError: boolean = false;
-  private touchTimeout?: number;
   private videoLoaded: boolean = false; // 新增：标记视频是否已加载
   private videoSrc?: string = "";
   private aspectRatio: number = 1; // 新增：存储图片实际宽高比
   private isLongPressPlaying: boolean = false; // 新增：标记是否由长按触发的播放
+  private longPressDelay: number = 300; // 长按触发延迟时间，默认 300ms
+  private touchStartTime: number = 0; // 记录触摸开始时间
+  private readonly options: LivePhotoOptions; // 保存配置选项
 
   constructor(options: LivePhotoOptions) {
+    this.options = options;
     this.autoplay = options.autoplay ?? true;
+    this.longPressDelay = options.longPressDelay ?? 300;
     this.container = this.createContainer(options);
     this.photo = this.createPhoto(options);
     this.video = this.createVideo(options);
@@ -56,7 +62,6 @@ export class LivePhotoViewer {
     this.container.appendChild(this.dropMenu);
     options.container.appendChild(this.container);
 
-    this.touchTimeout = undefined;
     this.videoSrc = options.videoSrc || "";
 
     this.init(options);
@@ -309,18 +314,25 @@ export class LivePhotoViewer {
   }
 
   private handleTouchStart(): void {
-    this.touchTimeout = setTimeout(() => {
-      // 移动端长按播放，标记为长按触发
-      if (!this.videoError && !this.isPlaying) {
-        this.isLongPressPlaying = true;
-        this.play();
-      }
-    }, 500); // 长按 500ms
+    this.touchStartTime = Date.now();
+    
+    // 直接开始播放（无延时）
+    if (!this.videoError && !this.isPlaying) {
+      this.isLongPressPlaying = true;
+      this.play();
+    }
   }
 
   private handleTouchEnd(): void {
-    clearTimeout(this.touchTimeout);
-    // 只有当播放是由长按触发时，松手才停止播放
+    const touchDuration = Date.now() - this.touchStartTime;
+    
+    // 判断是短按还是长按
+    if (touchDuration < this.longPressDelay) {
+      // 短按（点击）- 触发 onClick 回调
+      this.options.onClick?.();
+    }
+    
+    // 停止播放（无论长按还是短按）
     if (this.isLongPressPlaying && !this.videoError && this.isPlaying) {
       this.isLongPressPlaying = false;
       this.stop();

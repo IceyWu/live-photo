@@ -9,6 +9,18 @@ export default {
       format: 'umd',
       name: 'LivePhotoViewer',
       sourcemap: true,
+      exports: 'named',
+    },
+    {
+      file: 'dist/LivePhotoViewer.esm.js',
+      format: 'es',
+      sourcemap: true,
+    },
+    {
+      file: 'dist/LivePhotoViewer.cjs.js',
+      format: 'cjs',
+      sourcemap: true,
+      exports: 'named',
     },
   ],
   plugins: [
