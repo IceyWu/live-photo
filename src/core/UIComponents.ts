@@ -76,20 +76,22 @@ export class UIComponents {
     return video;
   }
 
-  public static createBadge(autoplay: boolean): HTMLDivElement {
+  public static createBadge(autoplay: boolean, staticIcon: boolean = false): HTMLDivElement {
     const badge = document.createElement('div');
     badge.className = 'live-photo-badge';
-    UIComponents.updateBadgeContent(badge, 100, autoplay);
+    UIComponents.updateBadgeContent(badge, 100, autoplay, staticIcon);
     return badge;
   }
 
   public static updateBadgeContent(
     badge: HTMLDivElement,
     progress: number,
-    autoplay: boolean
+    autoplay: boolean,
+    staticIcon: boolean = false
   ): void {
+    const showSlash = staticIcon ? false : !autoplay;
     badge.innerHTML = `
-      ${createProgressLiveIcon(progress, !autoplay)}
+      ${createProgressLiveIcon(progress, showSlash)}
       <span class="live-text">LIVE</span>
       <span class="chevron">${arrowIcon}</span>
     `;

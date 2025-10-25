@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LivePhoto Viewer Test</title>
-    <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
-    <!-- <script src="../dist/LivePhotoViewer.js"></script> -->
+    <!-- <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script> -->
+    <script src="../dist/LivePhotoViewer.js"></script>
   </head>
   <body>
     <div style="height: 40vh" id="live-photo-container"></div>
@@ -24,7 +24,8 @@
           container: container,
           height: "100%",
           borderRadius: "8px",
-          autoplay: true,
+          autoplay: false,
+          staticBadgeIcon: true,
           lazyLoadVideo: false,
           longPressDelay: 300,
           enableVibration: true,

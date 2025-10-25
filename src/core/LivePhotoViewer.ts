@@ -39,6 +39,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
       longPressDelay: 300,
       retryAttempts: 3,
       enableVibration: true,
+      staticBadgeIcon: false,
       ...options,
     };
 
@@ -66,7 +67,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
       this.options.lazyLoadVideo ?? false,
       videoCustomization
     );
-    this.badge = UIComponents.createBadge(this.options.autoplay ?? true);
+    this.badge = UIComponents.createBadge(this.options.autoplay ?? true, this.options.staticBadgeIcon ?? false);
     this.dropMenu = UIComponents.createDropMenu(this.options.autoplay ?? true);
     this.progressBar = UIComponents.createProgressBar();
     this.overlay = UIComponents.createOverlay();
@@ -127,14 +128,16 @@ export class LivePhotoViewer implements LivePhotoAPI {
   private setupDesktopEvents(): void {
     this.eventManager.addEventListener(this.badge, 'mouseenter', () => {
       const state = this.stateManager.getState();
-      if (!state.videoError && state.autoplay) {
+      // 悬浮播放：只要没有错误就可以播放，不受 autoplay 状态限制
+      if (!state.videoError) {
         this.play();
       }
     });
 
     this.eventManager.addEventListener(this.badge, 'mouseleave', () => {
       const state = this.stateManager.getState();
-      if (!state.videoError && state.autoplay) {
+      // 鼠标离开时停止播放
+      if (!state.videoError) {
         this.stop();
       }
     });
@@ -178,13 +181,13 @@ export class LivePhotoViewer implements LivePhotoAPI {
       const progress = Math.floor((this.video.buffered.end(0) / this.video.duration) * 100);
       const state = this.stateManager.getState();
       
-      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay);
+      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay, this.options.staticBadgeIcon ?? false);
       this.options.onProgress?.(progress);
 
       // Restore badge after loading complete
       if (progress >= 100) {
         setTimeout(() => {
-          UIComponents.updateBadgeContent(this.badge, 100, state.autoplay);
+          UIComponents.updateBadgeContent(this.badge, 100, state.autoplay, this.options.staticBadgeIcon ?? false);
         }, 500);
       }
     }
@@ -194,7 +197,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
     if (this.video.buffered.length > 0) {
       const progress = Math.floor((this.video.buffered.end(0) / this.video.duration) * 100);
       const state = this.stateManager.getState();
-      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay);
+      UIComponents.updateBadgeContent(this.badge, progress, state.autoplay, this.options.staticBadgeIcon ?? false);
     }
   }
 
@@ -215,7 +218,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
       button.textContent = newAutoplay ? '关闭自动播放' : '开启自动播放';
     }
     
-    UIComponents.updateBadgeContent(this.badge, 100, newAutoplay);
+    UIComponents.updateBadgeContent(this.badge, 100, newAutoplay, this.options.staticBadgeIcon ?? false);
     this.toggleDropMenu();
     
     // 如果关闭自动播放且正在播放，则停止
@@ -306,14 +309,14 @@ export class LivePhotoViewer implements LivePhotoAPI {
       // Load video if not loaded yet
       if (!state.videoLoaded && !this.video.src) {
         this.progressBar.style.opacity = '1';
-        UIComponents.updateBadgeContent(this.badge, 0, state.autoplay);
+        UIComponents.updateBadgeContent(this.badge, 0, state.autoplay, this.options.staticBadgeIcon ?? false);
         this.video.src = this.videoSrc;
         this.stateManager.setState({ videoLoaded: true });
       }
 
       this.stateManager.setState({ isPlaying: true });
       this.video.currentTime = 0;
-      UIComponents.updateBadgeContent(this.badge, 100, state.autoplay);
+      UIComponents.updateBadgeContent(this.badge, 100, state.autoplay, this.options.staticBadgeIcon ?? false);
       
       await this.video.play();
 

@@ -94,6 +94,7 @@ const viewer = new LivePhotoViewer({
 | preload            | 'auto' \| 'metadata' \| 'none' | ❌  | -       | Video preload strategy                                                   |
 | retryAttempts      | number                     | ❌       | `3`     | Number of retry attempts for failed video loads                          |
 | enableVibration    | boolean                    | ❌       | `true`  | Enable haptic feedback on supported devices                              |
+| staticBadgeIcon    | boolean                    | ❌       | `false` | Keep badge icon static (no slash) regardless of autoplay state           |
 | imageCustomization | ElementCustomization       | ❌       | -       | Custom attributes and styles for the image element                       |
 | videoCustomization | ElementCustomization       | ❌       | -       | Custom attributes and styles for the video element                       |
 

@@ -94,6 +94,7 @@ const viewer = new LivePhotoViewer({
 | preload            | 'auto' \| 'metadata' \| 'none' | ❌ | -    | 视频预加载策略                                            |
 | retryAttempts      | number                     | ❌   | `3`     | 视频加载失败时的重试次数                                  |
 | enableVibration    | boolean                    | ❌   | `true`  | 在支持的设备上启用震动反馈                                |
+| staticBadgeIcon    | boolean                    | ❌   | `false` | 保持徽章图标静态(无斜杠),不随 autoplay 状态变化           |
 | imageCustomization | ElementCustomization       | ❌   | -       | 图片元素的自定义属性和样式                                |
 | videoCustomization | ElementCustomization       | ❌   | -       | 视频元素的自定义属性和样式                                |
 

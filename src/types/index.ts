@@ -26,6 +26,7 @@ export interface LivePhotoOptions {
   preload?: 'auto' | 'metadata' | 'none';
   retryAttempts?: number;
   enableVibration?: boolean;
+  staticBadgeIcon?: boolean;
   
   // Customization
   imageCustomization?: ElementCustomization;
