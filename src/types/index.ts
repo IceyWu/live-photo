@@ -18,6 +18,9 @@ export interface LivePhotoOptions {
   lazyLoadVideo?: boolean;
   longPressDelay?: number;
   
+  // Styling
+  borderRadius?: number | string;
+  
   // New options
   theme?: 'light' | 'dark' | 'auto';
   preload?: 'auto' | 'metadata' | 'none';

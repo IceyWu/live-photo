@@ -25,6 +25,14 @@ export class UIComponents {
     if (options.theme) {
       container.setAttribute('data-theme', options.theme);
     }
+
+    // Apply borderRadius to container
+    if (options.borderRadius) {
+      const borderRadius = typeof options.borderRadius === 'number' 
+        ? `${options.borderRadius}px` 
+        : options.borderRadius;
+      container.style.borderRadius = borderRadius;
+    }
     
     return container;
   }

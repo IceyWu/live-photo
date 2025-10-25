@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LivePhoto Viewer Test</title>
-    <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
-    <!-- <script src="../dist/LivePhotoViewer.js"></script> -->
+    <!-- <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script> -->
+    <script src="../dist/LivePhotoViewer.js"></script>
   </head>
   <body>
-    <div style="height: 40vh;" id="live-photo-container"></div>
+    <div style="height: 40vh" id="live-photo-container"></div>
     <script>
       const demoSource = {
         photoSrc:
@@ -24,10 +24,10 @@
           container: container,
           // width: 300,
           height: "100%",
+          borderRadius: "8px",
           imageCustomization: {
             styles: {
               objectFit: "cover",
-              borderRadius: "8px",
             },
             attributes: {
               alt: "Live Photo Demo",

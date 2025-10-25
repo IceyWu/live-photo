@@ -1,5 +1,5 @@
 import "./LivePhotoViewer.css";
-import type { LivePhotoOptions, LivePhotoAPI, LivePhotoState, LivePhotoError } from '../types';
+import type { LivePhotoOptions, LivePhotoAPI, LivePhotoState, LivePhotoError, ElementCustomization } from '../types';
 import { StateManager } from './StateManager';
 import { EventManager } from './EventManager';
 import { VideoLoader } from './VideoLoader';
@@ -54,11 +54,16 @@ export class LivePhotoViewer implements LivePhotoAPI {
 
     // Create UI components
     this.container = UIComponents.createContainer(this.options);
-    this.photo = UIComponents.createPhoto(this.options.photoSrc, this.options.imageCustomization);
+    
+    // Merge borderRadius into customization if provided
+    const imageCustomization = this.mergeCustomization(this.options.imageCustomization, this.options.borderRadius);
+    const videoCustomization = this.mergeCustomization(this.options.videoCustomization, this.options.borderRadius);
+    
+    this.photo = UIComponents.createPhoto(this.options.photoSrc, imageCustomization);
     this.video = UIComponents.createVideo(
       this.options.videoSrc,
       this.options.lazyLoadVideo ?? false,
-      this.options.videoCustomization
+      videoCustomization
     );
     this.badge = UIComponents.createBadge(this.options.autoplay ?? true);
     this.dropMenu = UIComponents.createDropMenu(this.options.autoplay ?? true);
@@ -380,6 +385,32 @@ export class LivePhotoViewer implements LivePhotoAPI {
 
   public getState(): Readonly<LivePhotoState> {
     return this.stateManager.getState();
+  }
+
+  private mergeCustomization(
+    customization?: ElementCustomization,
+    borderRadius?: number | string
+  ): ElementCustomization | undefined {
+    if (!borderRadius && !customization) {
+      return customization;
+    }
+
+    const merged: ElementCustomization = {
+      ...customization,
+      styles: {
+        ...customization?.styles,
+      },
+    };
+
+    // Only apply borderRadius if not already set in customization
+    if (borderRadius && !customization?.styles?.borderRadius) {
+      const borderRadiusValue = typeof borderRadius === 'number' 
+        ? `${borderRadius}px` 
+        : borderRadius;
+      merged.styles!.borderRadius = borderRadiusValue as any;
+    }
+
+    return merged;
   }
 }
 
