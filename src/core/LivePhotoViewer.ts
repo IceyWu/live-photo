@@ -127,14 +127,14 @@ export class LivePhotoViewer implements LivePhotoAPI {
   private setupDesktopEvents(): void {
     this.eventManager.addEventListener(this.badge, 'mouseenter', () => {
       const state = this.stateManager.getState();
-      if (!state.videoError) {
+      if (!state.videoError && state.autoplay) {
         this.play();
       }
     });
 
     this.eventManager.addEventListener(this.badge, 'mouseleave', () => {
       const state = this.stateManager.getState();
-      if (!state.videoError) {
+      if (!state.videoError && state.autoplay) {
         this.stop();
       }
     });
@@ -218,9 +218,8 @@ export class LivePhotoViewer implements LivePhotoAPI {
     UIComponents.updateBadgeContent(this.badge, 100, newAutoplay);
     this.toggleDropMenu();
     
-    if (newAutoplay) {
-      this.play();
-    } else {
+    // 如果关闭自动播放且正在播放，则停止
+    if (!newAutoplay && state.isPlaying) {
       this.stop();
     }
   }
