@@ -1,6 +1,34 @@
 # Changelog
 
 
+## v0.0.47
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.46...v0.0.47)
+
+### 🚀 Enhancements
+
+- 添加长按延迟和短按点击回调，优化用户交互体验 ([0943b89](https://github.com/iceywu/live-photo/commit/0943b89))
+- Implement EventManager for centralized event handling ([dd71597](https://github.com/iceywu/live-photo/commit/dd71597))
+- Enhance LivePhotoViewer with borderRadius customization ([46ddbb1](https://github.com/iceywu/live-photo/commit/46ddbb1))
+- 添加视频覆盖层以防止阻塞滚动并优化触摸事件处理 ([5f84688](https://github.com/iceywu/live-photo/commit/5f84688))
+- 更新事件处理逻辑以支持自动播放状态，优化下拉菜单显示 ([9c903b7](https://github.com/iceywu/live-photo/commit/9c903b7))
+
+### 💅 Refactors
+
+- 移除不必要的配置项，简化rollup配置文件 ([77ed7ce](https://github.com/iceywu/live-photo/commit/77ed7ce))
+
+### 📖 Documentation
+
+- Update ([3835fbb](https://github.com/iceywu/live-photo/commit/3835fbb))
+
+### 🏡 Chore
+
+- **release:** V0.0.46 ([d8e2dc5](https://github.com/iceywu/live-photo/commit/d8e2dc5))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](https://github.com/Life-Palette))
+
 ## v0.0.46
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.45...v0.0.46)
