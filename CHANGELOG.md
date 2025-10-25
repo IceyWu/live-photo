@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.0.48
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.47...v0.0.48)
+
+### 🚀 Enhancements
+
+- 添加 staticBadgeIcon 选项以控制徽章图标的静态状态 ([139ce7e](https://github.com/iceywu/live-photo/commit/139ce7e))
+
+### 🏡 Chore
+
+- **release:** V0.0.47 ([f28ccc9](https://github.com/iceywu/live-photo/commit/f28ccc9))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](https://github.com/Life-Palette))
+
 ## v0.0.47
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.46...v0.0.47)
