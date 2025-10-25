@@ -20,6 +20,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
   private readonly badge: HTMLDivElement;
   private readonly dropMenu: HTMLDivElement;
   private readonly progressBar: HTMLDivElement;
+  private readonly overlay: HTMLDivElement;
   
   private readonly options: LivePhotoOptions;
   private touchStartTime: number = 0;
@@ -68,6 +69,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
     this.badge = UIComponents.createBadge(this.options.autoplay ?? true);
     this.dropMenu = UIComponents.createDropMenu(this.options.autoplay ?? true);
     this.progressBar = UIComponents.createProgressBar();
+    this.overlay = UIComponents.createOverlay();
 
     // Assemble DOM
     this.assembleDOM();
@@ -83,6 +85,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
     this.container.appendChild(this.progressBar);
     this.container.appendChild(this.photo);
     this.container.appendChild(this.video);
+    this.container.appendChild(this.overlay);
     this.container.appendChild(this.badge);
     this.container.appendChild(this.dropMenu);
     this.options.container.appendChild(this.container);
@@ -117,8 +120,8 @@ export class LivePhotoViewer implements LivePhotoAPI {
   }
 
   private setupMobileEvents(): void {
-    this.eventManager.addEventListener(this.container, 'touchstart', this.handleTouchStart.bind(this));
-    this.eventManager.addEventListener(this.container, 'touchend', this.handleTouchEnd.bind(this));
+    this.eventManager.addEventListener(this.overlay, 'touchstart', this.handleTouchStart.bind(this));
+    this.eventManager.addEventListener(this.overlay, 'touchend', this.handleTouchEnd.bind(this));
   }
 
   private setupDesktopEvents(): void {

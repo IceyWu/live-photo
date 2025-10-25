@@ -101,6 +101,12 @@ export class UIComponents {
     return progressBar;
   }
 
+  public static createOverlay(): HTMLDivElement {
+    const overlay = document.createElement('div');
+    overlay.className = 'live-photo-overlay';
+    return overlay;
+  }
+
   public static createDropMenu(autoplay: boolean): HTMLDivElement {
     const menu = document.createElement('div');
     menu.className = 'dropdown-menu';
