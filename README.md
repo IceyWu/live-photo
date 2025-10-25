@@ -10,205 +10,641 @@
   <br>
 </h1>
 
-<p align="center">🚀A simple and easy-to-use Live Photo web viewer component that allows you to display effects similar to iOS Live Photos on the web. </p>
+<p align="center">🚀 A powerful and lightweight Live Photo web viewer component that brings iOS-style Live Photos experience to the web.</p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img src="https://img.shields.io/npm/v/live-photo?color=a1b858&label=" alt="NPM version"></a>
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/live-photo?color=50a36f&label="></a>
 </p>
 
-**Eenglish** | [中文](./README.zh-CN.md)
+**English** | [中文](./README.zh-CN.md)
 
 ## ✨ Features
 
-- 🎯 Zero dependencies, lightweight implementation
-<!-- - 📱 Supports both mobile and desktop -->
-- 🖼️ Seamless switching between images and videos
-- 🎨 Customizable sizes and styles
-- 🚀 Easy-to-use API
+- 🎯 **Zero Dependencies** - Lightweight implementation with no external dependencies
+- 📱 **Cross-Platform** - Seamless support for both mobile (touch) and desktop (mouse) interactions
+- 🖼️ **Smart Media Handling** - Automatic switching between photo and video with smooth transitions
+- 🎨 **Highly Customizable** - Flexible styling and configuration options for both image and video elements
+- 🔄 **Advanced Loading** - Support for lazy loading and progressive video loading with visual feedback
+- ⚡ **Performance Optimized** - Efficient resource management and clean-up mechanisms
+- 🎮 **Rich API** - Comprehensive public methods and event callbacks for full control
+- 🎭 **Interactive Experience** - Long-press to play, click detection, auto-play modes, and haptic feedback
+- � **State Management** - Built-in state tracking and subscription system
+- 🛡️ **Type Safe** - Full TypeScript support with complete type definitions
+- 🎪 **Framework Agnostic** - Works with vanilla JavaScript, Vue, React, Angular, and more
 
 ## 📦 Installation
 
 ```bash
 npm install live-photo
-or
+# or
 pnpm add live-photo
-or
+# or
 yarn add live-photo
-or
-bun i live-photo
+# or
+bun add live-photo
 ```
 
-## 📖 API
+## 🚀 Quick Start
 
-### Configuration Options
-
-| Parameter          | Type                       | Required | Description                                 |
-| ------------------ | -------------------------- | -------- | ------------------------------------------- |
-| photoSrc           | string                     | Yes      | Image resource URL                          |
-| videoSrc           | string                     | Yes      | Video resource URL                          |
-| container          | HTMLElement                | Yes      | Container DOM element                       |
-| width              | number｜string             | No       | Viewer width (default: 300px)               |
-| height             | number｜string             | No       | Viewer height (default: 300px)              |
-| autoplay           | boolean                    | No       | Whether to autoplay (default: false)        |
-| lazyLoadVideo      | boolean                    | No       | Whether to lazy load video (default: false) |
-| longPressDelay     | number                     | No       | Long press threshold in ms (default: 300)   |
-| imageCustomization | ElementCustomization       | No       | Image element customization                 |
-| videoCustomization | ElementCustomization       | No       | Video element customization                 |
-| onCanPlay          | () => void                 | No       | Callback when video can play                |
-| onClick            | () => void                 | No       | Callback on click (short press)             |
-| onError            | (e?: any) => void          | No       | Callback on load error                      |
-| onEnded            | () => void                 | No       | Callback when video ends                    |
-| onVideoLoad        | () => void                 | No       | Callback when video loads                   |
-| onPhotoLoad        | () => void                 | No       | Callback when image loads                   |
-| onProgress         | (progress: number) => void | No       | Callback for video loading progress         |
-
-### ElementCustomization Type
-
-| Parameter  | Type                      | Description     |
-| ---------- | ------------------------- | --------------- |
-| attributes | { [key: string]: string } | HTML attributes |
-| styles     | { [key: string]: string } | CSS styles      |
-
-### Methods
-
-| Method | Description                   |
-| ------ | ----------------------------- |
-| play   | Start playing the video       |
-| pause  | Pause the video               |
-| toggle | Toggle play and pause state   |
-| stop   | Stop the video and reset time |
-
-## 🔧 Development Environment
-
-- Bun
-- Modern browser support
-
-## 📚 Usage Example
-
-### Native JavaScript Example
-
-[View HTML example code](./demo/html-demo.html)
+### Browser (CDN)
 
 ```html
 <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+
 <div id="live-photo-container"></div>
 
 <script>
-  const demoSource = {
-    photoSrc:
-      "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
-    videoSrc:
-      "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
-  };
-  document.addEventListener("DOMContentLoaded", function () {
-    const container = document.getElementById("live-photo-container");
-    new LivePhotoViewer({
-      photoSrc: demoSource.photoSrc,
-      videoSrc: demoSource.videoSrc,
-      container: container,
-      width: 300,
-      height: 300,
-      imageCustomization: {
-        styles: {
-          objectFit: "cover",
-          borderRadius: "8px",
-        },
-        attributes: {
-          alt: "Live Photo Demo",
-          loading: "lazy",
-        },
-      },
-    });
+  new LivePhotoViewer({
+    photoSrc: 'path/to/photo.jpg',
+    videoSrc: 'path/to/video.mp4',
+    container: document.getElementById('live-photo-container'),
   });
 </script>
 ```
 
-### Vue 3 Example (TypeScript, Composition API)
+### ES Module
 
-[View Vue 3 example code](./demo/vue3-demo.html)
+```javascript
+import { LivePhotoViewer } from 'live-photo';
+
+const viewer = new LivePhotoViewer({
+  photoSrc: 'path/to/photo.jpg',
+  videoSrc: 'path/to/video.mp4',
+  container: document.getElementById('live-photo-container'),
+});
+```
+
+## 📖 API Reference
+
+### Configuration Options
+
+| Parameter          | Type                       | Required | Default | Description                                                              |
+| ------------------ | -------------------------- | -------- | ------- | ------------------------------------------------------------------------ |
+| photoSrc           | string                     | ✅       | -       | URL of the static image to display                                      |
+| videoSrc           | string                     | ✅       | -       | URL of the video to play on interaction                                 |
+| container          | HTMLElement                | ✅       | -       | DOM element to mount the viewer                                          |
+| width              | number \| string           | ❌       | `300px` | Width of the viewer (supports px, %, vh, vw, etc.)                       |
+| height             | number \| string           | ❌       | `300px` | Height of the viewer (supports px, %, vh, vw, etc.)                      |
+| autoplay           | boolean                    | ❌       | `true`  | Enable automatic video playback on hover (desktop) or long-press (mobile)|
+| lazyLoadVideo      | boolean                    | ❌       | `false` | Delay video loading until viewer is in viewport                         |
+| longPressDelay     | number                     | ❌       | `300`   | Time threshold (ms) to distinguish between click and long-press          |
+| borderRadius       | number \| string           | ❌       | -       | Border radius for the container (supports px, %, rem, etc.)              |
+| theme              | 'light' \| 'dark' \| 'auto'| ❌       | -       | Color theme for UI elements                                              |
+| preload            | 'auto' \| 'metadata' \| 'none' | ❌  | -       | Video preload strategy                                                   |
+| retryAttempts      | number                     | ❌       | `3`     | Number of retry attempts for failed video loads                          |
+| enableVibration    | boolean                    | ❌       | `true`  | Enable haptic feedback on supported devices                              |
+| imageCustomization | ElementCustomization       | ❌       | -       | Custom attributes and styles for the image element                       |
+| videoCustomization | ElementCustomization       | ❌       | -       | Custom attributes and styles for the video element                       |
+
+### ElementCustomization Interface
 
 ```typescript
+interface ElementCustomization {
+  attributes?: Record<string, string>;  // HTML attributes (e.g., { alt: "...", loading: "lazy" })
+  styles?: Partial<CSSStyleDeclaration>; // CSS styles (e.g., { objectFit: "cover" })
+}
+```
+
+### Event Callbacks
+
+| Callback       | Parameters               | Description                                          |
+| -------------- | ------------------------ | ---------------------------------------------------- |
+| onPhotoLoad    | `() => void`             | Triggered when the photo finishes loading            |
+| onVideoLoad    | `() => void`             | Triggered when the video finishes loading            |
+| onCanPlay      | `() => void`             | Triggered when the video is ready to play            |
+| onLoadStart    | `() => void`             | Triggered when video loading starts (lazy load mode) |
+| onLoadProgress | `(loaded, total) => void`| Triggered during video download progress             |
+| onProgress     | `(progress) => void`     | Triggered with video buffering progress (0-100)      |
+| onEnded        | `() => void`             | Triggered when video playback completes              |
+| onClick        | `() => void`             | Triggered on short press/click                       |
+| onError        | `(error) => void`        | Triggered when an error occurs                       |
+
+### LivePhotoError Interface
+
+```typescript
+interface LivePhotoError {
+  type: 'VIDEO_LOAD_ERROR' | 'PHOTO_LOAD_ERROR' | 'PLAYBACK_ERROR' | 'VALIDATION_ERROR';
+  message: string;
+  originalError?: Error;
+}
+```
+
+### Public Methods
+
+All methods are available on the `LivePhotoViewer` instance:
+
+| Method           | Returns         | Description                                          |
+| ---------------- | --------------- | ---------------------------------------------------- |
+| `play()`         | `Promise<void>` | Start or resume video playback                       |
+| `pause()`        | `void`          | Pause video playback                                 |
+| `stop()`         | `void`          | Stop video and reset to beginning                    |
+| `toggle()`       | `void`          | Toggle between play and pause states                 |
+| `getState()`     | `LivePhotoState`| Get current viewer state (readonly)                  |
+| `destroy()`      | `void`          | Clean up resources and remove viewer from DOM        |
+
+### LivePhotoState Interface
+
+```typescript
+interface LivePhotoState {
+  isPlaying: boolean;           // Whether video is currently playing
+  autoplay: boolean;            // Current autoplay setting
+  videoError: boolean;          // Whether video loading failed
+  videoLoaded: boolean;         // Whether video has been loaded
+  aspectRatio: number;          // Calculated aspect ratio of the photo
+  isLongPressPlaying: boolean;  // Whether playing due to long-press
+}
+```
+
+## 🎯 How It Works
+
+### Desktop Interaction
+- **Hover on Badge**: Video plays automatically when hovering over the LIVE badge (if autoplay is enabled)
+- **Hover Off**: Video stops and returns to photo
+- **Click Badge**: Opens dropdown menu to toggle autoplay settings
+
+### Mobile Interaction
+- **Long Press**: Hold down on the photo to play the video
+- **Release**: Video stops and returns to photo
+- **Short Tap**: Triggers `onClick` callback without playing video
+- **Haptic Feedback**: Vibration feedback on supported devices (if enabled)
+
+### Loading Behavior
+- **Standard Loading**: Video loads immediately with the component
+- **Lazy Loading**: Video loads only when the viewer enters the viewport
+- **Progress Indicator**: Visual feedback shows loading progress in the LIVE badge
+- **Error Recovery**: Automatic retry mechanism for failed loads
+
+## 🎨 Customization
+
+### Styling
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  
+  // Container styling
+  width: "100%",
+  height: "auto",
+  borderRadius: "16px",
+  theme: "dark",
+  
+  // Image customization
+  imageCustomization: {
+    styles: {
+      objectFit: "cover",
+      filter: "brightness(1.1)",
+    },
+    attributes: {
+      alt: "My Live Photo",
+      loading: "lazy",
+      draggable: "false",
+    },
+  },
+  
+  // Video customization
+  videoCustomization: {
+    styles: {
+      objectFit: "contain",
+      filter: "contrast(1.1)",
+    },
+    attributes: {
+      preload: "metadata",
+    },
+  },
+});
+```
+
+### Custom CSS
+
+You can override the default styles using CSS:
+
+```css
+/* Container */
+.live-photo-container {
+  border: 2px solid #4F46E5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge */
+.live-photo-badge {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Playing state */
+.live-photo-container.playing {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  background: rgba(255, 255, 255, 0.95);
+}
+```
+
+## 🔧 Browser Support
+
+- ✅ Chrome (latest)
+- ✅ Firefox (latest)
+- ✅ Safari (latest)
+- ✅ Edge (latest)
+- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+
+### Requirements
+- Modern browser with ES6+ support
+- Support for `IntersectionObserver` (for lazy loading)
+- Support for `Promise` and `async/await`
+
+## 📋 Best Practices
+
+1. **Optimize Media Files**
+   - Use compressed images (JPEG, WebP)
+   - Use short video clips (2-3 seconds recommended)
+   - Consider using adaptive bitrate videos for better performance
+
+2. **Use Lazy Loading**
+   - Enable `lazyLoadVideo: true` for content below the fold
+   - Improves initial page load performance
+
+3. **Handle Errors Gracefully**
+   - Always implement `onError` callback
+   - Provide fallback UI for failed loads
+
+4. **Clean Up Resources**
+   - Call `destroy()` method when removing the viewer
+   - Especially important in SPAs (Single Page Applications)
+
+5. **Responsive Design**
+   - Use relative units (`%`, `vh`, `vw`) for responsive sizing
+   - Set appropriate `objectFit` values for your aspect ratios
+
+## 🐛 Troubleshooting
+
+### Video not playing on mobile
+- Ensure video has `muted` attribute (automatically set by the component)
+- Check that video format is supported (MP4 H.264 recommended)
+- Verify that `playsInline` is set (automatically set by the component)
+
+### Video not loading
+- Check video URL is accessible and CORS-enabled
+- Verify video file is not corrupted
+- Check browser console for specific errors
+- Try increasing `retryAttempts` option
+
+### Performance issues
+- Enable `lazyLoadVideo` for multiple viewers on one page
+- Optimize video file size and format
+- Consider using shorter video clips
+
+### Autoplay not working
+- Verify `autoplay: true` is set in options
+- Check that video is muted (required for autoplay in browsers)
+- Desktop: Ensure you're hovering over the badge
+- Mobile: Use long-press instead (autoplay works differently)
+
+## 🔧 Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Development mode with watch
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Run playground
+cd playground
+pnpm dev
+```
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 💖 Support
+
+If you find this project helpful, please consider:
+- ⭐ Starring the repository
+- 🐛 Reporting bugs
+- 💡 Suggesting new features
+- 📖 Improving documentation
+
+## 📬 Contact
+
+- Author: Icey Wu
+- Email: 3128006406@qq.com
+- GitHub: [@IceyWu](https://github.com/iceywu)
+
+## 🙏 Acknowledgments
+
+Inspired by Apple's Live Photos feature on iOS devices.
+
+---
+
+Made with ❤️ by [Icey Wu](https://github.com/iceywu)
+
+## � Usage Examples
+
+### Vanilla JavaScript
+
+[View complete HTML demo](./demo/html-demo.html)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Photo Demo</title>
+  <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+</head>
+<body>
+  <div id="live-photo-container"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const container = document.getElementById("live-photo-container");
+      
+      const viewer = new LivePhotoViewer({
+        photoSrc: "https://example.com/photo.jpg",
+        videoSrc: "https://example.com/video.mp4",
+        container: container,
+        width: 400,
+        height: 600,
+        borderRadius: "12px",
+        autoplay: true,
+        lazyLoadVideo: true,
+        enableVibration: true,
+        imageCustomization: {
+          styles: {
+            objectFit: "cover",
+          },
+          attributes: {
+            alt: "Beautiful Live Photo",
+            loading: "lazy",
+          },
+        },
+        videoCustomization: {
+          styles: {
+            objectFit: "cover",
+          },
+        },
+        // Event callbacks
+        onPhotoLoad: () => console.log("Photo loaded"),
+        onVideoLoad: () => console.log("Video loaded"),
+        onProgress: (progress) => console.log(`Loading: ${progress}%`),
+        onError: (error) => console.error("Error:", error),
+        onClick: () => console.log("Clicked!"),
+      });
+
+      // Control playback programmatically
+      // viewer.play();
+      // viewer.pause();
+      // viewer.stop();
+      // viewer.toggle();
+      
+      // Get current state
+      // const state = viewer.getState();
+      // console.log(state.isPlaying, state.autoplay);
+    });
+  </script>
+</body>
+</html>
+```
+
+### Vue 3 (Composition API)
+
+[View complete Vue 3 demo](./demo/vue3-demo.html)
+
+```vue
 <template>
   <div ref="containerRef"></div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { LivePhotoViewer } from "live-photo";
-const demoSource = {
-  photoSrc:
-    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
-  videoSrc:
-    "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
-};
+import type { LivePhotoAPI } from "live-photo";
+
 const containerRef = ref<HTMLElement | null>(null);
+const viewerInstance = ref<LivePhotoAPI | null>(null);
 
 onMounted(() => {
   if (containerRef.value) {
-    new LivePhotoViewer({
-      photoSrc: demoSource.photoSrc,
-      videoSrc: demoSource.videoSrc,
+    viewerInstance.value = new LivePhotoViewer({
+      photoSrc: "https://example.com/photo.jpg",
+      videoSrc: "https://example.com/video.mp4",
       container: containerRef.value,
-      width: 300,
-      height: 300,
+      width: 400,
+      height: 600,
+      borderRadius: "12px",
+      autoplay: true,
+      lazyLoadVideo: true,
+      enableVibration: true,
       imageCustomization: {
-            styles: {
-              objectFit: "cover",
-              borderRadius: "8px",
-            },
-            attributes: {
-              alt: "Live Photo Demo",
-              loading: "lazy",
-            },
+        styles: {
+          objectFit: "cover",
         },
+        attributes: {
+          alt: "Beautiful Live Photo",
+          loading: "lazy",
+        },
+      },
+      videoCustomization: {
+        styles: {
+          objectFit: "cover",
+        },
+      },
+      onPhotoLoad: () => console.log("Photo loaded"),
+      onVideoLoad: () => console.log("Video loaded"),
+      onProgress: (progress) => console.log(`Loading: ${progress}%`),
+      onError: (error) => console.error("Error:", error),
+      onClick: () => console.log("Clicked!"),
     });
   }
 });
+
+// Clean up on component unmount
+onUnmounted(() => {
+  if (viewerInstance.value) {
+    viewerInstance.value.destroy();
+  }
+});
+
+// Example: Control methods
+const play = () => viewerInstance.value?.play();
+const pause = () => viewerInstance.value?.pause();
+const toggle = () => viewerInstance.value?.toggle();
 </script>
 ```
 
-### React Example (TypeScript)
+### React (TypeScript)
 
-[View React example code](./demo/react-demo.html)
+[View complete React demo](./demo/react-demo.html)
 
-```typescript
+```tsx
 import React, { useEffect, useRef } from "react";
 import { LivePhotoViewer } from "live-photo";
+import type { LivePhotoAPI } from "live-photo";
 
-const ReactDemo: React.FC = () => {
-  const demoSource = {
-    photoSrc:
-      "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
-    videoSrc:
-      "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
-  };
-  const containerRef = useRef<HTMLDivElement | null>(null);
+const LivePhotoComponent: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<LivePhotoAPI | null>(null);
 
   useEffect(() => {
     if (containerRef.current) {
-      new LivePhotoViewer({
-        photoSrc: demoSource.photoSrc,
-        videoSrc: demoSource.videoSrc,
+      viewerRef.current = new LivePhotoViewer({
+        photoSrc: "https://example.com/photo.jpg",
+        videoSrc: "https://example.com/video.mp4",
         container: containerRef.current,
-        width: 300,
-        height: 300,
+        width: 400,
+        height: 600,
+        borderRadius: "12px",
+        autoplay: true,
+        lazyLoadVideo: true,
+        enableVibration: true,
         imageCustomization: {
           styles: {
             objectFit: "cover",
-            borderRadius: "8px",
           },
           attributes: {
-            alt: "Live Photo Demo",
+            alt: "Beautiful Live Photo",
             loading: "lazy",
           },
         },
+        videoCustomization: {
+          styles: {
+            objectFit: "cover",
+          },
+        },
+        onPhotoLoad: () => console.log("Photo loaded"),
+        onVideoLoad: () => console.log("Video loaded"),
+        onProgress: (progress) => console.log(`Loading: ${progress}%`),
+        onError: (error) => console.error("Error:", error),
+        onClick: () => console.log("Clicked!"),
       });
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (viewerRef.current) {
+        viewerRef.current.destroy();
+      }
+    };
   }, []);
 
-  return <div ref={containerRef}></div>;
+  // Example: Control methods
+  const handlePlay = () => viewerRef.current?.play();
+  const handlePause = () => viewerRef.current?.pause();
+  const handleToggle = () => viewerRef.current?.toggle();
+
+  return (
+    <div>
+      <div ref={containerRef}></div>
+      <div>
+        <button onClick={handlePlay}>Play</button>
+        <button onClick={handlePause}>Pause</button>
+        <button onClick={handleToggle}>Toggle</button>
+      </div>
+    </div>
+  );
 };
 
-export default ReactDemo;
+export default LivePhotoComponent;
+```
+
+### Advanced Usage
+
+#### Lazy Loading with Intersection Observer
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  lazyLoadVideo: true, // Video loads only when viewer is in viewport
+  onLoadStart: () => {
+    console.log("Video loading started");
+  },
+  onProgress: (progress) => {
+    console.log(`Video buffering: ${progress}%`);
+  },
+});
+```
+
+#### Custom Error Handling
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  retryAttempts: 5, // Retry 5 times on failure
+  onError: (error) => {
+    switch (error.type) {
+      case 'VIDEO_LOAD_ERROR':
+        console.error("Failed to load video:", error.message);
+        // Show fallback UI
+        break;
+      case 'PHOTO_LOAD_ERROR':
+        console.error("Failed to load photo:", error.message);
+        break;
+      case 'PLAYBACK_ERROR':
+        console.error("Playback failed:", error.message);
+        break;
+    }
+  },
+});
+```
+
+#### State Subscription
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+});
+
+// Get current state
+const state = viewer.getState();
+console.log(state.isPlaying); // false
+console.log(state.autoplay);  // true
+
+// Note: For reactive state updates, you can poll getState() 
+// or use the event callbacks
+```
+
+#### Responsive Sizing
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  width: "100%",      // Responsive width
+  height: "50vh",     // 50% of viewport height
+  borderRadius: "1rem",
+  imageCustomization: {
+    styles: {
+      objectFit: "cover",  // Maintain aspect ratio
+    },
+  },
+});
 ```

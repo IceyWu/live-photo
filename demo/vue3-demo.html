@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue 3 LivePhoto Viewer Demo</title>
-    <!-- <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script> -->
-    <script src="../dist/LivePhotoViewer.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+    <!-- <script src="../dist/LivePhotoViewer.js"></script> -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   </head>
   <body>
@@ -17,30 +17,69 @@
         setup() {
           const demoSource = {
             photoSrc:
-              "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+              "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
             videoSrc:
               "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
           };
           const containerRef = ref(null);
+          const viewerInstance = ref(null);
 
           onMounted(() => {
-            new LivePhotoViewer({
-              photoSrc: demoSource.photoSrc,
-              videoSrc: demoSource.videoSrc,
-              container: containerRef.value,
-              // width: 300,
-              height: "100%",
-              imageCustomization: {
-                styles: {
-                  objectFit: "cover",
-                  // borderRadius: "8px",
+            if (containerRef.value) {
+              viewerInstance.value = new LivePhotoViewer({
+                photoSrc: demoSource.photoSrc,
+                videoSrc: demoSource.videoSrc,
+                container: containerRef.value,
+                height: "100%",
+                borderRadius: "8px",
+                autoplay: true,
+                lazyLoadVideo: false,
+                longPressDelay: 300,
+                enableVibration: true,
+                imageCustomization: {
+                  styles: {
+                    objectFit: "cover",
+                  },
+                  attributes: {
+                    alt: "Live Photo Demo",
+                    loading: "lazy",
+                  },
                 },
-                attributes: {
-                  alt: "Live Photo Demo",
-                  loading: "lazy",
+                videoCustomization: {
+                  styles: {
+                    objectFit: "cover",
+                  },
                 },
-              },
-            });
+                onPhotoLoad: () => {
+                  console.log("Photo loaded");
+                },
+                onVideoLoad: () => {
+                  console.log("Video loaded");
+                },
+                onCanPlay: () => {
+                  console.log("Video can play");
+                },
+                onEnded: () => {
+                  console.log("Video ended");
+                },
+                onError: (error) => {
+                  console.error("Error:", error);
+                },
+                onProgress: (progress) => {
+                  console.log("Loading progress:", progress + "%");
+                },
+                onClick: () => {
+                  console.log("Clicked!");
+                },
+              });
+
+              // Example: Using public API methods
+              // viewerInstance.value.play();
+              // viewerInstance.value.pause();
+              // viewerInstance.value.stop();
+              // viewerInstance.value.toggle();
+              // console.log(viewerInstance.value.getState());
+            }
           });
 
           return { containerRef };

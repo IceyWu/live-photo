@@ -19,7 +19,7 @@ onMounted(() => {
       height: "100%",
       // width: "30vw",
       // height: "30vw",
-      // autoplay: false,
+      // autoplay: true,
       // lazyLoadVideo: true, // 启用延迟加载
       // imageCustomization: {
       //   styles: {

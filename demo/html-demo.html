@@ -4,27 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LivePhoto Viewer Test</title>
-    <!-- <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script> -->
-    <script src="../dist/LivePhotoViewer.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+    <!-- <script src="../dist/LivePhotoViewer.js"></script> -->
   </head>
   <body>
     <div style="height: 40vh" id="live-photo-container"></div>
     <script>
       const demoSource = {
         photoSrc:
-          "http://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
+          "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160256.JPEG",
         videoSrc:
           "https://nest-js.oss-accelerate.aliyuncs.com/nestTest/1/1733058160657.MOV",
       };
       document.addEventListener("DOMContentLoaded", function () {
         const container = document.getElementById("live-photo-container");
-        new LivePhotoViewer({
+        const viewer = new LivePhotoViewer({
           photoSrc: demoSource.photoSrc,
           videoSrc: demoSource.videoSrc,
           container: container,
-          // width: 300,
           height: "100%",
           borderRadius: "8px",
+          autoplay: true,
+          lazyLoadVideo: false,
+          longPressDelay: 300,
+          enableVibration: true,
           imageCustomization: {
             styles: {
               objectFit: "cover",
@@ -34,7 +37,40 @@
               loading: "lazy",
             },
           },
+          videoCustomization: {
+            styles: {
+              objectFit: "cover",
+            },
+          },
+          onPhotoLoad: () => {
+            console.log("Photo loaded");
+          },
+          onVideoLoad: () => {
+            console.log("Video loaded");
+          },
+          onCanPlay: () => {
+            console.log("Video can play");
+          },
+          onEnded: () => {
+            console.log("Video ended");
+          },
+          onError: (error) => {
+            console.error("Error:", error);
+          },
+          onProgress: (progress) => {
+            console.log("Loading progress:", progress + "%");
+          },
+          onClick: () => {
+            console.log("Clicked!");
+          },
         });
+
+        // Example: Using public API methods
+        // viewer.play();
+        // viewer.pause();
+        // viewer.stop();
+        // viewer.toggle();
+        // console.log(viewer.getState());
       });
     </script>
   </body>
