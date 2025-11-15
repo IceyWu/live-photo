@@ -33,13 +33,13 @@ export interface LivePhotoOptions {
   videoCustomization?: ElementCustomization;
   
   // Callbacks
-  onCanPlay?: () => void;
-  onClick?: () => void;
-  onError?: (error: LivePhotoError) => void;
-  onEnded?: () => void;
-  onVideoLoad?: () => void;
-  onPhotoLoad?: () => void;
-  onProgress?: (progress: number) => void;
+  onCanPlay?: (event: Event, video: HTMLVideoElement) => void;
+  onClick?: (event: Event) => void;
+  onError?: (error: LivePhotoError, event?: Event) => void;
+  onEnded?: (event: Event, video: HTMLVideoElement) => void;
+  onVideoLoad?: (duration: number, event: Event, video: HTMLVideoElement) => void;
+  onPhotoLoad?: (event: Event, photo: HTMLImageElement) => void;
+  onProgress?: (progress: number, event: Event, video: HTMLVideoElement) => void;
   onLoadStart?: () => void;
   onLoadProgress?: (loaded: number, total: number) => void;
 }

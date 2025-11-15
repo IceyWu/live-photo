@@ -109,17 +109,19 @@ interface ElementCustomization {
 
 ### 事件回调
 
+所有回调现在都会返回原始事件对象和相关元素,让您可以访问完整的事件信息和元素属性。
+
 | 回调           | 参数                     | 描述                                    |
 | -------------- | ------------------------ | --------------------------------------- |
-| onPhotoLoad    | `() => void`             | 图片加载完成时触发                      |
-| onVideoLoad    | `() => void`             | 视频加载完成时触发                      |
-| onCanPlay      | `() => void`             | 视频准备好播放时触发                    |
-| onLoadStart    | `() => void`             | 视频开始加载时触发(懒加载模式)          |
-| onLoadProgress | `(loaded, total) => void`| 视频下载进度时触发                      |
-| onProgress     | `(progress) => void`     | 视频缓冲进度时触发(0-100)               |
-| onEnded        | `() => void`             | 视频播放完成时触发                      |
-| onClick        | `() => void`             | 短按/点击时触发                         |
-| onError        | `(error) => void`        | 发生错误时触发                          |
+| onPhotoLoad    | `(event, photo) => void`             | 图片加载完成时触发,返回事件对象和图片元素                      |
+| onVideoLoad    | `(duration, event, video) => void`   | 视频元数据加载完成时触发,返回视频时长(秒)、事件对象和视频元素  |
+| onCanPlay      | `(event, video) => void`             | 视频准备好播放时触发,返回事件对象和视频元素                    |
+| onLoadStart    | `() => void`                         | 视频开始加载时触发(懒加载模式)          |
+| onLoadProgress | `(loaded, total) => void`            | 视频下载进度时触发                      |
+| onProgress     | `(progress, event, video) => void`   | 视频缓冲进度时触发(0-100),返回进度、事件对象和视频元素         |
+| onEnded        | `(event, video) => void`             | 视频播放完成时触发,返回事件对象和视频元素                      |
+| onClick        | `(event) => void`                    | 短按/点击时触发,返回事件对象                         |
+| onError        | `(error, event?) => void`            | 发生错误时触发,返回错误对象和可选的事件对象                    |
 
 ### LivePhotoError 接口
 
@@ -407,11 +409,17 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
           },
         },
         // 事件回调
-        onPhotoLoad: () => console.log("照片已加载"),
-        onVideoLoad: () => console.log("视频已加载"),
-        onProgress: (progress) => console.log(`加载中: ${progress}%`),
-        onError: (error) => console.error("错误:", error),
-        onClick: () => console.log("已点击!"),
+        onPhotoLoad: (event, photo) => {
+          console.log("照片已加载", photo.naturalWidth, "x", photo.naturalHeight);
+        },
+        onVideoLoad: (duration, event, video) => {
+          console.log(`视频已加载，时长: ${duration}秒`);
+        },
+        onProgress: (progress, event, video) => {
+          console.log(`加载中: ${progress}%`);
+        },
+        onError: (error, event) => console.error("错误:", error),
+        onClick: (event) => console.log("已点击!"),
       });
 
       // 通过编程方式控制播放
@@ -472,11 +480,17 @@ onMounted(() => {
           objectFit: "cover",
         },
       },
-      onPhotoLoad: () => console.log("照片已加载"),
-      onVideoLoad: () => console.log("视频已加载"),
-      onProgress: (progress) => console.log(`加载中: ${progress}%`),
-      onError: (error) => console.error("错误:", error),
-      onClick: () => console.log("已点击!"),
+      onPhotoLoad: (event, photo) => {
+        console.log("照片已加载", photo.naturalWidth, "x", photo.naturalHeight);
+      },
+      onVideoLoad: (duration, event, video) => {
+        console.log(`视频已加载，时长: ${duration}秒`);
+      },
+      onProgress: (progress, event, video) => {
+        console.log(`加载中: ${progress}%`);
+      },
+      onError: (error, event) => console.error("错误:", error),
+      onClick: (event) => console.log("已点击!"),
     });
   }
 });
@@ -534,11 +548,17 @@ const LivePhotoComponent: React.FC = () => {
             objectFit: "cover",
           },
         },
-        onPhotoLoad: () => console.log("照片已加载"),
-        onVideoLoad: () => console.log("视频已加载"),
-        onProgress: (progress) => console.log(`加载中: ${progress}%`),
-        onError: (error) => console.error("错误:", error),
-        onClick: () => console.log("已点击!"),
+        onPhotoLoad: (event, photo) => {
+          console.log("照片已加载", photo.naturalWidth, "x", photo.naturalHeight);
+        },
+        onVideoLoad: (duration, event, video) => {
+          console.log(`视频已加载，时长: ${duration}秒`);
+        },
+        onProgress: (progress, event, video) => {
+          console.log(`加载中: ${progress}%`);
+        },
+        onError: (error, event) => console.error("错误:", error),
+        onClick: (event) => console.log("已点击!"),
       });
     }
 
@@ -572,6 +592,59 @@ export default LivePhotoComponent;
 
 ### 高级用法
 
+#### 访问回调参数
+
+所有回调现在都提供原始事件对象和相关元素,让您可以访问完整的DOM信息:
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  
+  onVideoLoad: (duration, event, video) => {
+    // duration: 视频时长(秒),是HTML5 Video API的标准单位
+    console.log(`视频时长: ${duration}秒`);
+    
+    // event: 原始DOM事件对象
+    console.log("事件类型:", event.type); // "loadedmetadata"
+    console.log("是否可信:", event.isTrusted);
+    
+    // video: HTMLVideoElement 元素
+    console.log("视频尺寸:", video.videoWidth, "x", video.videoHeight);
+    console.log("当前时间:", video.currentTime);
+    console.log("就绪状态:", video.readyState);
+  },
+  
+  onProgress: (progress, event, video) => {
+    // progress: 加载进度百分比 (0-100)
+    console.log(`进度: ${progress}%`);
+    
+    // 通过video元素访问更多信息
+    if (video.buffered.length > 0) {
+      const bufferedEnd = video.buffered.end(0);
+      console.log(`已缓冲: ${bufferedEnd}秒`);
+    }
+  },
+  
+  onPhotoLoad: (event, photo) => {
+    // photo: HTMLImageElement 元素
+    console.log("图片原始尺寸:", photo.naturalWidth, "x", photo.naturalHeight);
+    console.log("图片显示尺寸:", photo.width, "x", photo.height);
+    console.log("图片源:", photo.src);
+  },
+  
+  onError: (error, event) => {
+    console.log("错误类型:", error.type);
+    console.log("错误信息:", error.message);
+    // event 是可选的,某些错误可能没有关联的事件
+    if (event) {
+      console.log("错误事件:", event);
+    }
+  },
+});
+```
+
 #### 使用 Intersection Observer 懒加载
 
 ```javascript
@@ -583,8 +656,9 @@ const viewer = new LivePhotoViewer({
   onLoadStart: () => {
     console.log("视频开始加载");
   },
-  onProgress: (progress) => {
+  onProgress: (progress, event, video) => {
     console.log(`视频缓冲中: ${progress}%`);
+    console.log(`已缓冲: ${video.buffered.length > 0 ? video.buffered.end(0) : 0}秒`);
   },
 });
 ```
@@ -597,7 +671,8 @@ const viewer = new LivePhotoViewer({
   videoSrc: "video.mp4",
   container: document.getElementById("container"),
   retryAttempts: 5, // 失败时重试 5 次
-  onError: (error) => {
+  onError: (error, event) => {
+    console.log("原始事件:", event);
     switch (error.type) {
       case 'VIDEO_LOAD_ERROR':
         console.error("视频加载失败:", error.message);

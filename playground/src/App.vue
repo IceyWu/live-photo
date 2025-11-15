@@ -42,27 +42,27 @@ onMounted(() => {
       //     controlsList: "nodownload",
       //   },
       // },
-      onProgress: (progress) => {
-        console.log(`视频加载进度: ${progress}%`);
+      onProgress: (progress, event, video) => {
+        console.log(`视频加载进度: ${progress}%`, { event, video });
       },
-      onCanPlay: () => {
-        console.log("onCanPlay");
+      onCanPlay: (event, video) => {
+        console.log("onCanPlay", { event, video });
       },
-      onEnded: () => {
-        console.log("onEnded");
+      onEnded: (event, video) => {
+        console.log("onEnded", { event, video });
       },
 
-      onPhotoLoad: () => {
-        console.log("onPhotoLoad");
+      onPhotoLoad: (event, photo) => {
+        console.log("onPhotoLoad", { event, photo });
       },
-      onVideoLoad: () => {
-        console.log("onVideoLoad");
+      onVideoLoad: (duration, event, video) => {
+        console.log("onVideoLoad - 视频总时长:", duration, "秒", { event, video });
       },
-      onError: (e) => {
-        console.log("onError", e);
+      onError: (error, event) => {
+        console.log("onError", { error, event });
       },
     });
-    console.log("🎉-----palyer-----", palyer);
+    // console.log("🎉-----palyer-----", palyer);
     // palyer.play();
   }
 });

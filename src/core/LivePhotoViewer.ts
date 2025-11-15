@@ -102,6 +102,8 @@ export class LivePhotoViewer implements LivePhotoAPI {
     this.eventManager.addEventListener(this.video, 'error', this.handleVideoError.bind(this));
     this.eventManager.addEventListener(this.video, 'progress', debounce(this.handleVideoProgress.bind(this), 100));
     this.eventManager.addEventListener(this.video, 'loadeddata', this.handleVideoLoadedData.bind(this));
+    this.eventManager.addEventListener(this.video, 'canplay', this.handleCanPlay.bind(this));
+    this.eventManager.addEventListener(this.video, 'loadedmetadata', this.handleVideoLoad.bind(this));
 
     // Badge events
     this.eventManager.addEventListener(this.badge, 'click', this.toggleDropMenu.bind(this));
@@ -143,18 +145,18 @@ export class LivePhotoViewer implements LivePhotoAPI {
     });
   }
 
-  private handlePhotoLoad(): void {
+  private handlePhotoLoad(event: Event): void {
     this.aspectRatio = this.photo.naturalWidth / this.photo.naturalHeight;
     this.updateContainerSize();
-    this.options.onPhotoLoad?.();
+    this.options.onPhotoLoad?.(event, this.photo);
   }
 
-  private handlePhotoError(): void {
+  private handlePhotoError(event: Event): void {
     const error = createLivePhotoError('PHOTO_LOAD_ERROR', 'Failed to load photo');
-    this.options.onError?.(error);
+    this.options.onError?.(error, event);
   }
 
-  private handleVideoEnd(): void {
+  private handleVideoEnd(event: Event): void {
     if (!this.video.loop) {
       this.stop();
       this.stateManager.setState({ 
@@ -162,27 +164,27 @@ export class LivePhotoViewer implements LivePhotoAPI {
         isLongPressPlaying: false 
       });
       this.container.classList.remove('playing');
-      this.options.onEnded?.();
+      this.options.onEnded?.(event, this.video);
     }
   }
 
-  private handleVideoError(): void {
+  private handleVideoError(event: Event): void {
     this.video.style.display = 'none';
     this.stateManager.setState({ videoError: true });
     this.badge.innerHTML = errorIcon;
     this.container.classList.remove('playing');
     
     const error = createLivePhotoError('VIDEO_LOAD_ERROR', 'Failed to load video');
-    this.options.onError?.(error);
+    this.options.onError?.(error, event);
   }
 
-  private handleVideoProgress(): void {
+  private handleVideoProgress(event: Event): void {
     if (this.video.buffered.length > 0) {
       const progress = Math.floor((this.video.buffered.end(0) / this.video.duration) * 100);
       const state = this.stateManager.getState();
       
       UIComponents.updateBadgeContent(this.badge, progress, state.autoplay, this.options.staticBadgeIcon ?? false);
-      this.options.onProgress?.(progress);
+      this.options.onProgress?.(progress, event, this.video);
 
       // Restore badge after loading complete
       if (progress >= 100) {
@@ -199,6 +201,15 @@ export class LivePhotoViewer implements LivePhotoAPI {
       const state = this.stateManager.getState();
       UIComponents.updateBadgeContent(this.badge, progress, state.autoplay, this.options.staticBadgeIcon ?? false);
     }
+  }
+
+  private handleCanPlay(event: Event): void {
+    this.options.onCanPlay?.(event, this.video);
+  }
+
+  private handleVideoLoad(event: Event): void {
+    const duration = this.video.duration || 0;
+    this.options.onVideoLoad?.(duration, event, this.video);
   }
 
   private toggleDropMenu(): void {
@@ -237,13 +248,13 @@ export class LivePhotoViewer implements LivePhotoAPI {
     }
   }
 
-  private handleTouchEnd(): void {
+  private handleTouchEnd(event: Event): void {
     const touchDuration = Date.now() - this.touchStartTime;
     const longPressDelay = this.options.longPressDelay ?? 300;
     
     // Short press (click)
     if (touchDuration < longPressDelay) {
-      this.options.onClick?.();
+      this.options.onClick?.(event);
     }
     
     // Stop playback

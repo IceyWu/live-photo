@@ -109,17 +109,19 @@ interface ElementCustomization {
 
 ### Event Callbacks
 
+All callbacks now return the original event object and related elements, giving you access to complete event information and element properties.
+
 | Callback       | Parameters               | Description                                          |
 | -------------- | ------------------------ | ---------------------------------------------------- |
-| onPhotoLoad    | `() => void`             | Triggered when the photo finishes loading            |
-| onVideoLoad    | `() => void`             | Triggered when the video finishes loading            |
-| onCanPlay      | `() => void`             | Triggered when the video is ready to play            |
-| onLoadStart    | `() => void`             | Triggered when video loading starts (lazy load mode) |
-| onLoadProgress | `(loaded, total) => void`| Triggered during video download progress             |
-| onProgress     | `(progress) => void`     | Triggered with video buffering progress (0-100)      |
-| onEnded        | `() => void`             | Triggered when video playback completes              |
-| onClick        | `() => void`             | Triggered on short press/click                       |
-| onError        | `(error) => void`        | Triggered when an error occurs                       |
+| onPhotoLoad    | `(event, photo) => void`             | Triggered when the photo finishes loading, returns event object and image element            |
+| onVideoLoad    | `(duration, event, video) => void`   | Triggered when video metadata is loaded, returns duration (seconds), event object and video element            |
+| onCanPlay      | `(event, video) => void`             | Triggered when the video is ready to play, returns event object and video element            |
+| onLoadStart    | `() => void`                         | Triggered when video loading starts (lazy load mode) |
+| onLoadProgress | `(loaded, total) => void`            | Triggered during video download progress             |
+| onProgress     | `(progress, event, video) => void`   | Triggered with video buffering progress (0-100), returns progress, event object and video element      |
+| onEnded        | `(event, video) => void`             | Triggered when video playback completes, returns event object and video element              |
+| onClick        | `(event) => void`                    | Triggered on short press/click, returns event object                       |
+| onError        | `(error, event?) => void`            | Triggered when an error occurs, returns error object and optional event object                       |
 
 ### LivePhotoError Interface
 
@@ -407,11 +409,17 @@ Made with ❤️ by [Icey Wu](https://github.com/iceywu)
           },
         },
         // Event callbacks
-        onPhotoLoad: () => console.log("Photo loaded"),
-        onVideoLoad: () => console.log("Video loaded"),
-        onProgress: (progress) => console.log(`Loading: ${progress}%`),
-        onError: (error) => console.error("Error:", error),
-        onClick: () => console.log("Clicked!"),
+        onPhotoLoad: (event, photo) => {
+          console.log("Photo loaded", photo.naturalWidth, "x", photo.naturalHeight);
+        },
+        onVideoLoad: (duration, event, video) => {
+          console.log(`Video loaded, duration: ${duration}s`);
+        },
+        onProgress: (progress, event, video) => {
+          console.log(`Loading: ${progress}%`);
+        },
+        onError: (error, event) => console.error("Error:", error),
+        onClick: (event) => console.log("Clicked!"),
       });
 
       // Control playback programmatically
@@ -472,11 +480,17 @@ onMounted(() => {
           objectFit: "cover",
         },
       },
-      onPhotoLoad: () => console.log("Photo loaded"),
-      onVideoLoad: () => console.log("Video loaded"),
-      onProgress: (progress) => console.log(`Loading: ${progress}%`),
-      onError: (error) => console.error("Error:", error),
-      onClick: () => console.log("Clicked!"),
+      onPhotoLoad: (event, photo) => {
+        console.log("Photo loaded", photo.naturalWidth, "x", photo.naturalHeight);
+      },
+      onVideoLoad: (duration, event, video) => {
+        console.log(`Video loaded, duration: ${duration}s`);
+      },
+      onProgress: (progress, event, video) => {
+        console.log(`Loading: ${progress}%`);
+      },
+      onError: (error, event) => console.error("Error:", error),
+      onClick: (event) => console.log("Clicked!"),
     });
   }
 });
@@ -534,11 +548,17 @@ const LivePhotoComponent: React.FC = () => {
             objectFit: "cover",
           },
         },
-        onPhotoLoad: () => console.log("Photo loaded"),
-        onVideoLoad: () => console.log("Video loaded"),
-        onProgress: (progress) => console.log(`Loading: ${progress}%`),
-        onError: (error) => console.error("Error:", error),
-        onClick: () => console.log("Clicked!"),
+        onPhotoLoad: (event, photo) => {
+          console.log("Photo loaded", photo.naturalWidth, "x", photo.naturalHeight);
+        },
+        onVideoLoad: (duration, event, video) => {
+          console.log(`Video loaded, duration: ${duration}s`);
+        },
+        onProgress: (progress, event, video) => {
+          console.log(`Loading: ${progress}%`);
+        },
+        onError: (error, event) => console.error("Error:", error),
+        onClick: (event) => console.log("Clicked!"),
       });
     }
 
@@ -572,6 +592,59 @@ export default LivePhotoComponent;
 
 ### Advanced Usage
 
+#### Accessing Callback Parameters
+
+All callbacks now provide the original event object and related elements, giving you access to complete DOM information:
+
+```javascript
+const viewer = new LivePhotoViewer({
+  photoSrc: "photo.jpg",
+  videoSrc: "video.mp4",
+  container: document.getElementById("container"),
+  
+  onVideoLoad: (duration, event, video) => {
+    // duration: Video duration in seconds (HTML5 Video API standard unit)
+    console.log(`Video duration: ${duration}s`);
+    
+    // event: Original DOM event object
+    console.log("Event type:", event.type); // "loadedmetadata"
+    console.log("Is trusted:", event.isTrusted);
+    
+    // video: HTMLVideoElement element
+    console.log("Video dimensions:", video.videoWidth, "x", video.videoHeight);
+    console.log("Current time:", video.currentTime);
+    console.log("Ready state:", video.readyState);
+  },
+  
+  onProgress: (progress, event, video) => {
+    // progress: Loading progress percentage (0-100)
+    console.log(`Progress: ${progress}%`);
+    
+    // Access more information through the video element
+    if (video.buffered.length > 0) {
+      const bufferedEnd = video.buffered.end(0);
+      console.log(`Buffered: ${bufferedEnd}s`);
+    }
+  },
+  
+  onPhotoLoad: (event, photo) => {
+    // photo: HTMLImageElement element
+    console.log("Image natural size:", photo.naturalWidth, "x", photo.naturalHeight);
+    console.log("Image display size:", photo.width, "x", photo.height);
+    console.log("Image source:", photo.src);
+  },
+  
+  onError: (error, event) => {
+    console.log("Error type:", error.type);
+    console.log("Error message:", error.message);
+    // event is optional, some errors may not have an associated event
+    if (event) {
+      console.log("Error event:", event);
+    }
+  },
+});
+```
+
 #### Lazy Loading with Intersection Observer
 
 ```javascript
@@ -583,8 +656,9 @@ const viewer = new LivePhotoViewer({
   onLoadStart: () => {
     console.log("Video loading started");
   },
-  onProgress: (progress) => {
+  onProgress: (progress, event, video) => {
     console.log(`Video buffering: ${progress}%`);
+    console.log(`Buffered: ${video.buffered.length > 0 ? video.buffered.end(0) : 0}s`);
   },
 });
 ```
@@ -597,7 +671,8 @@ const viewer = new LivePhotoViewer({
   videoSrc: "video.mp4",
   container: document.getElementById("container"),
   retryAttempts: 5, // Retry 5 times on failure
-  onError: (error) => {
+  onError: (error, event) => {
+    console.log("Original event:", event);
     switch (error.type) {
       case 'VIDEO_LOAD_ERROR':
         console.error("Failed to load video:", error.message);
