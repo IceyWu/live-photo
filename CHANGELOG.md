@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v0.0.49
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.48...v0.0.49)
+
+### 🚀 Enhancements
+
+- 更新事件回调以返回原始事件对象和相关元素，增强事件信息访问 ([fa91f0a](https://github.com/iceywu/live-photo/commit/fa91f0a))
+
+### 🏡 Chore
+
+- **release:** V0.0.48 ([0f1c4da](https://github.com/iceywu/live-photo/commit/0f1c4da))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](https://github.com/Life-Palette))
+
 ## v0.0.48
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.47...v0.0.48)
