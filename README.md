@@ -10,14 +10,18 @@
   <br>
 </h1>
 
-<p align="center">🚀A simple and easy-to-use Live Photo web viewer component that allows you to display effects similar to iOS Live Photos on the web. </p>
+<p align="center">🚀 <strong>live-photo</strong> — A tiny, zero-dependency Live Photo web viewer that works with any modern front-end framework (Vue, React, Angular, Svelte) or plain JavaScript. Bring iOS‑style Live Photos to the web with minimal code.</p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img src="https://img.shields.io/npm/v/live-photo?color=a1b858&label=" alt="NPM version"></a>
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/live-photo?color=50a36f&label="></a>
 </p>
 
-**Eenglish** | [中文](./README.zh-CN.md)
+<p align="center">
+Live demo: <a href="https://lpalette.cn" target="_blank">https://lpalette.cn</a>
+</p>
+
+**English** | [中文](./README.zh-CN.md)
 
 ## ✨ Features
 
@@ -26,6 +30,9 @@
 - 🖼️ Seamless switching between images and videos
 - 🎨 Customizable sizes and styles
 - 🚀 Easy-to-use API
+
+- 🔧 Works with Vue / React / Angular / Svelte / Vanilla JS
+- ⚡ Small footprint, easy to integrate into component-based apps
 
 ## 📦 Installation
 
