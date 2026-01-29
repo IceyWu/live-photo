@@ -10,11 +10,15 @@
   <br>
 </h1>
 
-<p align="center">🚀 A powerful and lightweight Live Photo web viewer component that brings iOS-style Live Photos experience to the web.</p>
+<p align="center">🚀 <strong>live-photo</strong> — A tiny, zero-dependency Live Photo web viewer that works with any modern front-end framework (Vue, React, Angular, Svelte) or plain JavaScript. Bring iOS‑style Live Photos to the web with minimal code.</p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img src="https://img.shields.io/npm/v/live-photo?color=a1b858&label=" alt="NPM version"></a>
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/live-photo?color=50a36f&label="></a>
+</p>
+
+<p align="center">
+Live demo: <a href="https://lpalette.cn" target="_blank">https://lpalette.cn</a>
 </p>
 
 **English** | [中文](./README.zh-CN.md)

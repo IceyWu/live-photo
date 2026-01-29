@@ -9,12 +9,15 @@
   live-photo
   <br>
 </h1>
-
-<p align="center">🚀 一个功能强大且轻量级的 Live Photo 网页查看器组件,将 iOS 风格的实时照片体验带到网页端。</p>
+<p align="center">🚀 <strong>live-photo</strong> — 轻量且零依赖的 Live Photo 网页查看器，兼容所有主流前端框架（Vue、React、Angular、Svelte），也可直接在原生 JavaScript 中使用。用最少的代码在网页上呈现接近 iOS 的实时照片体验。</p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img src="https://img.shields.io/npm/v/live-photo?color=a1b858&label=" alt="NPM version"></a>
 <a href="https://www.npmjs.com/package/live-photo" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/live-photo?color=50a36f&label="></a>
+</p>
+
+<p align="center">
+在线示例： <a href="https://lpalette.cn" target="_blank">https://lpalette.cn</a>
 </p>
 
 **中文** | [English](./README.md)
