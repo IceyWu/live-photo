@@ -9,3 +9,7 @@ export type {
   LivePhotoError,
   LivePhotoAPI,
 } from './types';
+
+// Export extract utilities
+export { extractFromLivePhoto } from './utils/livePhotoExtract';
+export type { ExtractResult } from './utils/livePhotoExtract';

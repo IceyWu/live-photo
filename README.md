@@ -49,6 +49,50 @@ yarn add live-photo
 bun add live-photo
 ```
 
+## 🛠️ Utility Functions
+
+### livePhotoExtract
+
+Extract photo and video from Live Photo files (HEIC/MOV combined format).
+
+```javascript
+import { extractFromLivePhoto } from 'live-photo';
+
+// Extract from file input
+const fileInput = document.querySelector('input[type="file"]');
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const result = await extractFromLivePhoto(file);
+  
+  if (result) {
+    const { photoBlob, photoUrl, videoBlob, videoUrl } = result;
+    
+    // Use extracted photo and video
+    const viewer = new LivePhotoViewer({
+      photoSrc: photoUrl,
+      videoSrc: videoUrl,
+      container: document.getElementById('container'),
+    });
+    
+    // Clean up URLs when done
+    // URL.revokeObjectURL(photoUrl);
+    // URL.revokeObjectURL(videoUrl);
+  }
+});
+```
+
+**Returns:**
+```typescript
+interface ExtractResult {
+  photoBlob: Blob;   // JPEG image blob
+  photoUrl: string;  // Object URL for the photo
+  videoBlob: Blob;   // MP4 video blob
+  videoUrl: string;  // Object URL for the video
+}
+```
+
+**Note:** Remember to revoke object URLs when they're no longer needed to prevent memory leaks.
+
 ## 🚀 Quick Start
 
 ### Browser (CDN)

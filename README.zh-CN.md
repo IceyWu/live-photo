@@ -48,6 +48,50 @@ yarn add live-photo
 bun add live-photo
 ```
 
+## 🛠️ 工具函数
+
+### livePhotoExtract
+
+从实况照片文件（HEIC/MOV 组合格式）中提取照片和视频。
+
+```javascript
+import { extractFromLivePhoto } from 'live-photo';
+
+// 从文件输入中提取
+const fileInput = document.querySelector('input[type="file"]');
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const result = await extractFromLivePhoto(file);
+  
+  if (result) {
+    const { photoBlob, photoUrl, videoBlob, videoUrl } = result;
+    
+    // 使用提取的照片和视频
+    const viewer = new LivePhotoViewer({
+      photoSrc: photoUrl,
+      videoSrc: videoUrl,
+      container: document.getElementById('container'),
+    });
+    
+    // 使用完毕后清理 URL
+    // URL.revokeObjectURL(photoUrl);
+    // URL.revokeObjectURL(videoUrl);
+  }
+});
+```
+
+**返回值:**
+```typescript
+interface ExtractResult {
+  photoBlob: Blob;   // JPEG 图片 blob
+  photoUrl: string;  // 照片的对象 URL
+  videoBlob: Blob;   // MP4 视频 blob
+  videoUrl: string;  // 视频的对象 URL
+}
+```
+
+**注意:** 记得在不再需要时撤销对象 URL 以防止内存泄漏。
+
 ## 🚀 快速开始
 
 ### 浏览器 (CDN)
