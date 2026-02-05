@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-Live demo: <a href="https://lpalette.cn" target="_blank">https://lpalette.cn</a>
+Live demo: <a href="https://live-photo.netlify.app" target="_blank">https://live-photo.netlify.app</a>
 </p>
 
 **English** | [中文](./README.zh-CN.md)
