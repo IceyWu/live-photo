@@ -90,7 +90,7 @@ const triggerFileInput = () => {
         {{ isProcessing ? '处理中...' : '选择实况照片' }}
       </button>
       
-      <p class="hint">支持 iPhone 实况照片（Live Photo）</p>
+      <p class="hint">（目前测试支持的机型有荣耀，小米）实况照片（Live Photo）</p>
     </div>
 
     <div v-if="error" class="error-message">
