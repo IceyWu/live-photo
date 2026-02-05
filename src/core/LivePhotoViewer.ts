@@ -1,8 +1,7 @@
 import "./LivePhotoViewer.css";
-import type { LivePhotoOptions, LivePhotoAPI, LivePhotoState, LivePhotoError, ElementCustomization } from '../types';
+import type { LivePhotoOptions, LivePhotoAPI, LivePhotoState, ElementCustomization } from '../types';
 import { StateManager } from './StateManager';
 import { EventManager } from './EventManager';
-import { VideoLoader } from './VideoLoader';
 import { UIComponents } from './UIComponents';
 import { validateOptions } from '../utils/validators';
 import { debounce } from '../utils/debounce';
@@ -12,7 +11,6 @@ import { errorIcon } from './icons';
 export class LivePhotoViewer implements LivePhotoAPI {
   private readonly stateManager: StateManager;
   private readonly eventManager: EventManager;
-  private readonly videoLoader: VideoLoader;
   
   private readonly container: HTMLElement;
   private readonly photo: HTMLImageElement;
@@ -49,7 +47,6 @@ export class LivePhotoViewer implements LivePhotoAPI {
     });
     
     this.eventManager = new EventManager();
-    this.videoLoader = new VideoLoader(this.options.retryAttempts);
 
     // Store video source
     this.videoSrc = this.options.videoSrc;
