@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-在线示例： <a href="https://lpalette.cn" target="_blank">https://lpalette.cn</a>
+在线示例： <a href="https://live-photo.netlify.app" target="_blank">https://live-photo.netlify.app</a>
 </p>
 
 **中文** | [English](./README.md)
