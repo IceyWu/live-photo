@@ -1,6 +1,27 @@
 # Changelog
 
 
+## v0.0.50
+
+[compare changes](https://github.com/iceywu/live-photo/compare/v0.0.49...v0.0.50)
+
+### 🚀 Enhancements
+
+- 更新 README 文件，增强组件描述并添加在线示例链接 ([836a955](https://github.com/iceywu/live-photo/commit/836a955))
+- **extract:** Add livePhotoExtract utility function for Live Photo file extraction ([b0999e1](https://github.com/iceywu/live-photo/commit/b0999e1))
+
+### 💅 Refactors
+
+- **core:** Remove unused VideoLoader dependency and LivePhotoError type import ([05826a3](https://github.com/iceywu/live-photo/commit/05826a3))
+
+### 📖 Documentation
+
+- **playground:** Update Live Photo support hint with tested device models ([b59e028](https://github.com/iceywu/live-photo/commit/b59e028))
+
+### ❤️ Contributors
+
+- IceyWu ([@Life-Palette](https://github.com/Life-Palette))
+
 ## v0.0.49
 
 [compare changes](https://github.com/iceywu/live-photo/compare/v0.0.48...v0.0.49)
