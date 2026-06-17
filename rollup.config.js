@@ -4,7 +4,6 @@ import postcss from 'rollup-plugin-postcss';
 export default {
   input: 'src/index.ts',
   treeshake: {
-    moduleSideEffects: ['**/*.css'],
     preset: 'recommended',
   },
   output: [
@@ -29,7 +28,7 @@ export default {
   ],
   plugins: [
     typescript({ tsconfig: './tsconfig.json' }),
-    postcss(),
+    postcss({ inject: true, extract: false }),
   ],
 };
 
