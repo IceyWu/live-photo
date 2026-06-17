@@ -3,6 +3,10 @@ import postcss from 'rollup-plugin-postcss';
 
 export default {
   input: 'src/index.ts',
+  treeshake: {
+    moduleSideEffects: ['**/*.css'],
+    preset: 'recommended',
+  },
   output: [
     {
       file: 'dist/LivePhotoViewer.js',

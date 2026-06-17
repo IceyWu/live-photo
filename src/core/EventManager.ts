@@ -4,7 +4,7 @@ interface EventRegistration {
   element: HTMLElement | Window | Document;
   event: string;
   handler: EventHandler;
-  boundHandler: EventHandler;
+  options?: AddEventListenerOptions;
 }
 
 export class EventManager {
@@ -16,15 +16,8 @@ export class EventManager {
     handler: EventHandler,
     options?: AddEventListenerOptions
   ): void {
-    const boundHandler = handler as EventHandler;
-    element.addEventListener(event, boundHandler, options);
-    
-    this.registrations.push({
-      element,
-      event,
-      handler,
-      boundHandler,
-    });
+    element.addEventListener(event, handler, options);
+    this.registrations.push({ element, event, handler, options });
   }
 
   public removeEventListener(
@@ -35,18 +28,17 @@ export class EventManager {
     const index = this.registrations.findIndex(
       reg => reg.element === element && reg.event === event && reg.handler === handler
     );
-    
     if (index !== -1) {
-      const registration = this.registrations[index];
-      element.removeEventListener(event, registration.boundHandler);
+      const { options } = this.registrations[index];
+      element.removeEventListener(event, handler, options);
       this.registrations.splice(index, 1);
     }
   }
 
   public destroy(): void {
-    this.registrations.forEach(({ element, event, boundHandler }) => {
-      element.removeEventListener(event, boundHandler);
+    this.registrations.forEach(({ element, event, handler, options }) => {
+      element.removeEventListener(event, handler, options);
     });
-    this.registrations = [];
+    this.registrations.length = 0; // 清空数组但保留引用，比重新赋值 [] 更节省分配
   }
 }

@@ -3,6 +3,23 @@ export interface ElementCustomization {
   styles?: Partial<CSSStyleDeclaration>;
 }
 
+/**
+ * Text labels used across the UI. All fields are required in a complete
+ * label set; users can override any subset via `labels`.
+ */
+export interface LivePhotoLabels {
+  /** Badge text, e.g. "LIVE" */
+  live: string;
+  /** Menu item shown when autoplay is OFF (clicking enables it) */
+  enableAutoplay: string;
+  /** Menu item shown when autoplay is ON (clicking disables it) */
+  disableAutoplay: string;
+  /** Menu item shown when sound is ON (clicking mutes) */
+  mute: string;
+  /** Menu item shown when muted (clicking unmutes) */
+  unmute: string;
+}
+
 export interface LivePhotoOptions {
   // Required
   photoSrc: string;
@@ -17,9 +34,21 @@ export interface LivePhotoOptions {
   autoplay?: boolean;
   lazyLoadVideo?: boolean;
   longPressDelay?: number;
+
+  // Audio
+  muted?: boolean;
+  showMuteButton?: boolean;
   
   // Styling
   borderRadius?: number | string;
+
+  // Internationalization
+  locale?: string;
+  labels?: Partial<LivePhotoLabels>;
+
+  // Persistence
+  /** localStorage key 前缀，设置后自动播放和静音偏好会被持久化。留空则不持久化。*/
+  storageKey?: string;
   
   // New options
   theme?: 'light' | 'dark' | 'auto';
@@ -42,6 +71,7 @@ export interface LivePhotoOptions {
   onProgress?: (progress: number, event: Event, video: HTMLVideoElement) => void;
   onLoadStart?: () => void;
   onLoadProgress?: (loaded: number, total: number) => void;
+  onMutedChange?: (muted: boolean, video: HTMLVideoElement) => void;
 }
 
 export interface LivePhotoState {
@@ -49,8 +79,8 @@ export interface LivePhotoState {
   autoplay: boolean;
   videoError: boolean;
   videoLoaded: boolean;
-  aspectRatio: number;
   isLongPressPlaying: boolean;
+  muted: boolean;
 }
 
 export interface LivePhotoError {
@@ -66,11 +96,13 @@ export interface LivePhotoAPI {
   toggle(): void;
   destroy(): void;
   getState(): Readonly<LivePhotoState>;
+  setMuted(muted: boolean): void;
+  toggleMute(): void;
 }
 
 // Global type declaration
 declare global {
   interface Window {
-    LivePhotoViewer: any;
+    LivePhotoViewer: typeof import('./core/LivePhotoViewer').LivePhotoViewer;
   }
 }

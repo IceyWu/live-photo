@@ -7,6 +7,8 @@ export interface ExtractResult {
   photoUrl: string
   videoBlob: Blob
   videoUrl: string
+  /** 释放 photoUrl 和 videoUrl 的 Object URL，不再使用时应调用 */
+  revoke(): void
 }
 
 /**
@@ -67,11 +69,21 @@ export async function extractFromLivePhoto(file: File): Promise<ExtractResult | 
     const photoBlob = new Blob([buffer.subarray(0, mp4Start)], { type: 'image/jpeg' })
     const videoBlob = new Blob([buffer.subarray(mp4Start)], { type: 'video/mp4' })
     
+    const photoUrl = URL.createObjectURL(photoBlob);
+    const videoUrl = URL.createObjectURL(videoBlob);
+    let revoked = false;
+
     return {
       photoBlob,
-      photoUrl: URL.createObjectURL(photoBlob),
+      photoUrl,
       videoBlob,
-      videoUrl: URL.createObjectURL(videoBlob)
+      videoUrl,
+      revoke() {
+        if (revoked) return;
+        revoked = true;
+        URL.revokeObjectURL(photoUrl);
+        URL.revokeObjectURL(videoUrl);
+      }
     }
   } catch {
     return null

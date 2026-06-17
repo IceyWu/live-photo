@@ -8,7 +8,31 @@ export type {
   LivePhotoState,
   LivePhotoError,
   LivePhotoAPI,
+  LivePhotoLabels,
 } from './types';
+
+export type { LoadAbortController } from './core/VideoLoader';
+export type { DebouncedFn } from './utils/debounce';
+
+// Export i18n helpers
+export { LOCALE_LABELS, DEFAULT_LOCALE, resolveLabels } from './core/i18n';
+
+// Export storage helpers
+export { loadPrefs, savePrefs } from './utils/storage';
+
+// Export UI component functions (for custom UI integration)
+export {
+  createContainer,
+  createPhoto,
+  createVideo,
+  createBadge,
+  createDropMenu,
+  createProgressBar,
+  createOverlay,
+  updateBadgeContent,
+  updateAutoplayButton,
+  updateMuteButton,
+} from './core/UIComponents';
 
 // Export extract utilities
 export { extractFromLivePhoto } from './utils/livePhotoExtract';

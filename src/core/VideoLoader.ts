@@ -1,33 +1,47 @@
+export interface LoadAbortController {
+  abort(): void;
+}
+
 export class VideoLoader {
-  private retryAttempts: number;
-  private currentAttempt: number = 0;
+  private readonly retryAttempts: number;
 
   constructor(retryAttempts: number = 3) {
     this.retryAttempts = retryAttempts;
   }
 
-  public async loadVideo(
+  public loadVideo(
     video: HTMLVideoElement,
     src: string,
     onProgress?: (loaded: number, total: number) => void
-  ): Promise<void> {
-    this.currentAttempt = 0;
+  ): { promise: Promise<void>; controller: LoadAbortController } {
+    // 用闭包变量，每次调用完全独立，互不干扰
+    let aborted = false;
+    let currentAttempt = 0;
+    const maxAttempts = this.retryAttempts;
 
-    while (this.currentAttempt < this.retryAttempts) {
-      try {
-        await this.attemptLoad(video, src, onProgress);
-        return;
-      } catch (error) {
-        this.currentAttempt++;
-        
-        if (this.currentAttempt >= this.retryAttempts) {
-          throw new Error(`Failed to load video after ${this.retryAttempts} attempts`);
+    const controller: LoadAbortController = {
+      abort: () => { aborted = true; },
+    };
+
+    const promise = (async () => {
+      while (currentAttempt < maxAttempts) {
+        if (aborted) return;
+
+        try {
+          await this.attemptLoad(video, src, onProgress);
+          return;
+        } catch (error) {
+          if (aborted) return;
+          currentAttempt++;
+          if (currentAttempt >= maxAttempts) {
+            throw new Error(`Failed to load video after ${maxAttempts} attempts`);
+          }
+          await new Promise<void>(resolve => setTimeout(resolve, 1000 * Math.pow(2, currentAttempt - 1)));
         }
-
-        // Exponential backoff
-        await this.delay(1000 * Math.pow(2, this.currentAttempt - 1));
       }
-    }
+    })();
+
+    return { promise, controller };
   }
 
   private attemptLoad(
@@ -36,21 +50,11 @@ export class VideoLoader {
     onProgress?: (loaded: number, total: number) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      const handleLoad = () => {
-        cleanup();
-        resolve();
-      };
-
-      const handleError = (e: Event) => {
-        cleanup();
-        reject(e);
-      };
-
+      const handleLoad = () => { cleanup(); resolve(); };
+      const handleError = (e: Event) => { cleanup(); reject(e); };
       const handleProgress = () => {
         if (video.buffered.length > 0 && onProgress) {
-          const loaded = video.buffered.end(0);
-          const total = video.duration;
-          onProgress(loaded, total);
+          onProgress(video.buffered.end(0), video.duration);
         }
       };
 
@@ -67,9 +71,5 @@ export class VideoLoader {
       video.src = src;
       video.load();
     });
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
