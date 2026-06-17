@@ -44,27 +44,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN != '' && secrets.RELEASE_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      # 同步发布 livephoto 包（与 live-photo 内容完全一致，仅 name 不同）
-      - name: Publish as livephoto
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          node -e "
-            const fs = require('fs');
-
-            // 替换 package.json name
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            pkg.name = 'livephoto';
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-
-            // 替换 README.md 中的包名引用
-            ['README.md', 'README.zh-CN.md'].forEach(file => {
-              if (!fs.existsSync(file)) return;
-              const content = fs.readFileSync(file, 'utf8')
-                .replace(/live-photo/g, 'livephoto');
-              fs.writeFileSync(file, content);
-            });
-          "
-          pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
