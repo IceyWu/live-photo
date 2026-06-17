@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.0
+
+### Minor Changes
+
+- f14d773: 重构与新特性
+
+  - 重构 UIComponents 为独立导出函数，支持 tree-shaking
+  - 新增 i18n 国际化支持（内置 zh-CN / en，支持自定义 locale 和 labels 覆盖）
+  - 新增 storageKey 持久化用户偏好（autoplay / muted）
+  - 新增 muted / showMuteButton / onMutedChange 音频控制
+  - 新增 onClick 回调，桌面端和移动端统一触发
+  - 新增 setMuted / toggleMute 公开 API
+  - VideoLoader 支持重试（指数退避）和取消机制
+  - StateManager 新增脏检查和快照缓存，减少无效更新
+  - destroy() 幂等保护，销毁后调用公开 API 静默忽略
+  - autoplay 等待图片加载完成后再触发
+  - 修复悬停播放与下拉菜单的鼠标移入冲突
+  - CSS 新增 auto 主题（跟随系统深色/浅色模式）
+  - 进度条加载完成后自动隐藏
+  - 新增完整文档（docs/）和更新 README
 
 ## v0.0.50
 
@@ -68,7 +88,7 @@
 
 ### 💅 Refactors
 
-- 移除不必要的配置项，简化rollup配置文件 ([77ed7ce](https://github.com/iceywu/live-photo/commit/77ed7ce))
+- 移除不必要的配置项，简化 rollup 配置文件 ([77ed7ce](https://github.com/iceywu/live-photo/commit/77ed7ce))
 
 ### 📖 Documentation
 
@@ -93,7 +113,7 @@
 
 ### 🩹 Fixes
 
-- 优化移动端长按播放逻辑，以及iphone设备长按导致图片选中问题 ([f6106f8](https://github.com/iceywu/live-photo/commit/f6106f8))
+- 优化移动端长按播放逻辑，以及 iphone 设备长按导致图片选中问题 ([f6106f8](https://github.com/iceywu/live-photo/commit/f6106f8))
 
 ### 🏡 Chore
 
@@ -138,7 +158,7 @@
 
 ### 🚀 Enhancements
 
-- 新增playground ([8aaf730](https://github.com/iceywu/live-photo/commit/8aaf730))
+- 新增 playground ([8aaf730](https://github.com/iceywu/live-photo/commit/8aaf730))
 - 优化 LivePhotoViewer 组件的触摸交互，添加触摸事件处理，增强动画效果 ([a6ce36e](https://github.com/iceywu/live-photo/commit/a6ce36e))
 - 更新 LivePhotoViewer 组件，添加触摸事件处理，优化视频播放控制和用户选择行为 ([879e013](https://github.com/iceywu/live-photo/commit/879e013))
 - 添加下拉菜单以控制自动播放功能，优化交互体验 ([cf6b5e1](https://github.com/iceywu/live-photo/commit/cf6b5e1))
@@ -163,7 +183,7 @@
 
 ### 🩹 Fixes
 
-- 修复dom重复添加 ([a748c89](https://github.com/iceywu/live-photo/commit/a748c89))
+- 修复 dom 重复添加 ([a748c89](https://github.com/iceywu/live-photo/commit/a748c89))
 
 ### ❤️ Contributors
 
@@ -195,7 +215,6 @@
 
 ## v0.0.2
 
-
 ### 🚀 Enhancements
 
 - Init ([373d535](https://github.com/live-photo/commit/373d535))
@@ -207,4 +226,3 @@
 ### ❤️ Contributors
 
 - IceyWu ([@Life-Palette](http://github.com/Life-Palette))
-
