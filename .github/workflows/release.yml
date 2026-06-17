@@ -65,6 +65,6 @@ jobs:
               fs.writeFileSync(file, content);
             });
           "
-          pnpm publish --no-git-checks --registry https://registry.npmjs.org
+          pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

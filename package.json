@@ -27,7 +27,7 @@
     "dev": "rollup -c -w",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm run release:check && pnpm exec changeset publish --registry https://registry.npmjs.org",
+    "release": "pnpm run release:check && pnpm exec changeset publish",
     "release:check": "pnpm run build"
   },
   "keywords": [
