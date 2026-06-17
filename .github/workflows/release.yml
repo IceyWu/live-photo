@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create release PR or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN != '' && secrets.RELEASE_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # 同步发布 livephoto 包（与 live-photo 内容完全一致，仅 name 不同）
+      - name: Publish as livephoto
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          node -e "
+            const fs = require('fs');
+
+            // 替换 package.json name
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.name = 'livephoto';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+
+            // 替换 README.md 中的包名引用
+            ['README.md', 'README.zh-CN.md'].forEach(file => {
+              if (!fs.existsSync(file)) return;
+              const content = fs.readFileSync(file, 'utf8')
+                .replace(/live-photo/g, 'livephoto');
+              fs.writeFileSync(file, content);
+            });
+          "
+          pnpm publish --no-git-checks --registry https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

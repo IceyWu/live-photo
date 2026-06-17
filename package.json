@@ -7,6 +7,11 @@
   "main": "dist/LivePhotoViewer.cjs.js",
   "module": "dist/LivePhotoViewer.esm.js",
   "types": "dist/index.d.ts",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "exports": {
     ".": {
       "import": "./dist/LivePhotoViewer.esm.js",
@@ -20,7 +25,10 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "release": "changelogen --release && npm publish --registry https://registry.npmjs.org"
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm run release:check && pnpm exec changeset publish --registry https://registry.npmjs.org",
+    "release:check": "pnpm run build"
   },
   "keywords": [
     "livephoto",
@@ -44,14 +52,11 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@rollup/plugin-typescript": "^12.3.0",
-    "changelogen": "^0.6.2",
-    "rollup": "^4.52.5",
+    "rollup": "^4.62.0",
     "rollup-plugin-postcss": "^4.0.2",
-    "typescript": "^5.9.3"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "tslib": "^2.8.1"
