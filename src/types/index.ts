@@ -103,6 +103,6 @@ export interface LivePhotoAPI {
 // Global type declaration
 declare global {
   interface Window {
-    LivePhotoViewer: typeof import('./core/LivePhotoViewer').LivePhotoViewer;
+    LivePhotoViewer: typeof import('../core/LivePhotoViewer').LivePhotoViewer;
   }
 }

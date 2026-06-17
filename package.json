@@ -14,9 +14,9 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/LivePhotoViewer.esm.js",
-      "require": "./dist/LivePhotoViewer.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/LivePhotoViewer.cjs.js"
     }
   },
   "files": [
