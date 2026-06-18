@@ -1,13 +1,32 @@
-# live-photo
+<div align="center">
 
-A zero-dependency Live Photo viewer for the web. Works with any framework or plain JavaScript.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.svg" />
+  <img src="./assets/banner.png" alt="live-photo" width="500" />
+</picture>
 
-**[中文文档](./README.zh-CN.md)** | [Live Demo](https://live-photo.netlify.app)
+<p></p>
 
-[![npm](https://img.shields.io/npm/v/live-photo?color=a1b858&label=)](https://www.npmjs.com/package/live-photo)
-[![downloads](https://img.shields.io/npm/dm/live-photo?color=50a36f&label=)](https://www.npmjs.com/package/live-photo)
+A zero-dependency <strong>Live Photo</strong> viewer for the web — works with any framework or plain JavaScript.
 
-## Install
+[![npm](https://img.shields.io/npm/v/live-photo?style=flat-square&color=18181b&label=npm)](https://www.npmjs.com/package/live-photo) [![downloads](https://img.shields.io/npm/dm/live-photo?style=flat-square&color=18181b&label=downloads)](https://www.npmjs.com/package/live-photo) [![gzip](https://img.shields.io/bundlephobia/minzip/live-photo?style=flat-square&color=18181b&label=gzip)](https://bundlephobia.com/package/live-photo) [![types](https://img.shields.io/npm/types/live-photo?style=flat-square&color=18181b&label=types)](https://www.npmjs.com/package/live-photo) [![license](https://img.shields.io/npm/l/live-photo?style=flat-square&color=18181b&label=license)](./LICENSE)
+
+**[English](./README.md)** · **[中文文档](./README.zh-CN.md)** · **[Live Demo](https://live-photo.netlify.app)**
+
+</div>
+
+---
+
+## ✨ Features
+
+- 🪶 **Zero dependencies** — tiny footprint, drops into any stack
+- 🧩 **Framework agnostic** — Vanilla JS, Vue 3, React, or CDN script tag
+- 📱 **Desktop & mobile** — hover to play, long-press on touch devices
+- 🌗 **Theming & i18n** — light / dark / auto themes, built-in locales
+- ⚡ **Lazy loading** — load video only when it enters the viewport
+- 🎛️ **Fully typed** — first-class TypeScript support
+
+## 📦 Install
 
 ```bash
 npm install live-photo
@@ -15,7 +34,7 @@ npm install live-photo
 # yarn add live-photo
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 **CDN**
 ```html
@@ -43,7 +62,7 @@ const viewer = new LivePhotoViewer({
 
 → More examples: [Vanilla JS](./docs/vanilla.md) · [Vue 3](./docs/vue.md) · [React](./docs/react.md)
 
-## Options
+## ⚙️ Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -76,7 +95,7 @@ interface ElementCustomization {
 }
 ```
 
-## Callbacks
+## 🔔 Callbacks
 
 | Callback | Signature | Trigger |
 |----------|-----------|---------|
@@ -99,7 +118,7 @@ interface LivePhotoError {
 }
 ```
 
-## Methods
+## 🛠️ Methods
 
 ```ts
 viewer.play()        // Promise<void>
@@ -123,19 +142,19 @@ interface LivePhotoState {
 }
 ```
 
-## Extract Live Photo
+## 📤 Extract Live Photo
 
 → See [docs/extract.md](./docs/extract.md)
 
-## i18n
+## 🌍 i18n
 
 → See [docs/i18n.md](./docs/i18n.md)
 
-## Styling
+## 🎨 Styling
 
 → See [docs/styling.md](./docs/styling.md)
 
-## CSS Variables
+## 🧬 CSS Variables
 
 ```css
 :root {
@@ -151,6 +170,12 @@ interface LivePhotoState {
 }
 ```
 
-## License
+## 📄 License
+
+<div align="center">
 
 MIT © [Icey Wu](https://github.com/iceywu)
+
+<sub>Built with care for the web. If this project helps you, consider giving it a ⭐.</sub>
+
+</div>

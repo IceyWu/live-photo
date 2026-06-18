@@ -1,13 +1,32 @@
-# live-photo
+<div align="center">
 
-零依赖的网页实况照片播放器，兼容所有主流框架和原生 JavaScript。
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.svg" />
+  <img src="./assets/banner.png" alt="live-photo" width="500" />
+</picture>
 
-**[English](./README.md)** | [在线示例](https://live-photo.netlify.app)
+<p></p>
 
-[![npm](https://img.shields.io/npm/v/live-photo?color=a1b858&label=)](https://www.npmjs.com/package/live-photo)
-[![downloads](https://img.shields.io/npm/dm/live-photo?color=50a36f&label=)](https://www.npmjs.com/package/live-photo)
+零依赖的网页 <strong>实况照片（Live Photo）</strong> 播放器，兼容所有主流框架和原生 JavaScript。
 
-## 安装
+[![npm](https://img.shields.io/npm/v/live-photo?style=flat-square&color=18181b&label=npm)](https://www.npmjs.com/package/live-photo) [![downloads](https://img.shields.io/npm/dm/live-photo?style=flat-square&color=18181b&label=downloads)](https://www.npmjs.com/package/live-photo) [![gzip](https://img.shields.io/bundlephobia/minzip/live-photo?style=flat-square&color=18181b&label=gzip)](https://bundlephobia.com/package/live-photo) [![types](https://img.shields.io/npm/types/live-photo?style=flat-square&color=18181b&label=types)](https://www.npmjs.com/package/live-photo) [![license](https://img.shields.io/npm/l/live-photo?style=flat-square&color=18181b&label=license)](./LICENSE)
+
+**[English](./README.md)** · **[中文文档](./README.zh-CN.md)** · **[在线示例](https://live-photo.netlify.app)**
+
+</div>
+
+---
+
+## ✨ 特性
+
+- 🪶 **零依赖** —— 体积极小，可嵌入任意技术栈
+- 🧩 **框架无关** —— 原生 JS、Vue 3、React 或 CDN script 标签
+- 📱 **桌面与移动端** —— 桌面悬停播放，触屏设备长按播放
+- 🌗 **主题与国际化** —— 浅色 / 深色 / 自动主题，内置多语言
+- ⚡ **懒加载** —— 视频进入视口后再加载
+- 🎛️ **完整类型** —— 一流的 TypeScript 支持
+
+## 📦 安装
 
 ```bash
 npm install live-photo
@@ -15,7 +34,7 @@ npm install live-photo
 # yarn add live-photo
 ```
 
-## 快速开始
+## 🚀 快速开始
 
 **CDN**
 ```html
@@ -43,7 +62,7 @@ const viewer = new LivePhotoViewer({
 
 → 更多示例：[原生 JS](./docs/vanilla.md) · [Vue 3](./docs/vue.md) · [React](./docs/react.md)
 
-## 配置项
+## ⚙️ 配置项
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -76,7 +95,7 @@ interface ElementCustomization {
 }
 ```
 
-## 回调事件
+## 🔔 回调事件
 
 | 回调 | 签名 | 触发时机 |
 |------|------|----------|
@@ -99,7 +118,7 @@ interface LivePhotoError {
 }
 ```
 
-## 方法
+## 🛠️ 方法
 
 ```ts
 viewer.play()        // Promise<void>
@@ -123,19 +142,19 @@ interface LivePhotoState {
 }
 ```
 
-## 实况照片提取
+## 📤 实况照片提取
 
 → 详见 [docs/extract.md](./docs/extract.md)
 
-## 国际化
+## 🌍 国际化
 
 → 详见 [docs/i18n.md](./docs/i18n.md)
 
-## 样式定制
+## 🎨 样式定制
 
 → 详见 [docs/styling.md](./docs/styling.md)
 
-## CSS 变量
+## 🧬 CSS 变量
 
 ```css
 :root {
@@ -151,6 +170,12 @@ interface LivePhotoState {
 }
 ```
 
-## License
+## 📄 License
+
+<div align="center">
 
 MIT © [Icey Wu](https://github.com/iceywu)
+
+<sub>用心为 Web 打造。如果这个项目对你有帮助，欢迎点一个 ⭐。</sub>
+
+</div>
