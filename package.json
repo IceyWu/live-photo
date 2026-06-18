@@ -1,6 +1,6 @@
 {
   "name": "live-photo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "A LivePhoto viewer for web applications",
   "author": "Icey Wu <3128006406@qq.com>",
