@@ -1,7 +1,7 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.png" />
   <img src="./assets/banner.png" alt="live-photo" width="500" />
 </picture>
 

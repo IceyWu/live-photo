@@ -11,10 +11,11 @@ export default function Demo() {
 
   useEffect(() => {
     const viewer = new LivePhotoViewer({
-      photoSrc: 'https://example.com/photo.jpg',
-      videoSrc: 'https://example.com/video.mp4',
+      photoSrc: 'https://lpalette.oss-accelerate.aliyuncs.com/go_oss/prod/mkIo6X4FryYKOcUzuz4Kew/2026-06-15/3c14973c-bfbb-4d8b-9296-d3be902e3171.jpeg',
+      videoSrc: 'https://lpalette.oss-accelerate.aliyuncs.com/go_oss/prod/mkIo6X4FryYKOcUzuz4Kew/videos/trans/979bc89e-16c1-4a3a-b8c4-daa4837d575c/720p.mp4',
       container: ref.current!,
       autoplay: true,
+      height: 320,
       borderRadius: 12,
       theme: 'auto',
       onEnded: () => console.log('播放结束'),
@@ -85,8 +86,8 @@ export default function App() {
     <div>
       <LivePhoto
         ref={ref}
-        photoSrc="https://example.com/photo.jpg"
-        videoSrc="https://example.com/video.mp4"
+        photoSrc="https://lpalette.oss-accelerate.aliyuncs.com/go_oss/prod/mkIo6X4FryYKOcUzuz4Kew/2026-06-15/3c14973c-bfbb-4d8b-9296-d3be902e3171.jpeg"
+        videoSrc="https://lpalette.oss-accelerate.aliyuncs.com/go_oss/prod/mkIo6X4FryYKOcUzuz4Kew/videos/trans/979bc89e-16c1-4a3a-b8c4-daa4837d575c/720p.mp4"
         width={400}
         height={400}
         autoplay
