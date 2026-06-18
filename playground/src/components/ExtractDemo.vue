@@ -1,197 +1,112 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
-import { extractFromLivePhoto, LivePhotoViewer } from '../../../src/index'
-import type { ExtractResult } from '../../../src/index'
-import { revokeUrls, downloadBlob } from '../utils/helpers'
+import { ref, nextTick } from 'vue';
+import { extractFromLivePhoto, LivePhotoViewer } from '../../../src/index';
+import type { ExtractResult } from '../../../src/index';
+import { revokeUrls, downloadBlob } from '../utils/helpers';
+import CodeBlock from './CodeBlock.vue';
 
-const fileInput = ref<HTMLInputElement | null>(null)
-const extractResult = ref<ExtractResult | null>(null)
-const isProcessing = ref(false)
-const error = ref<string>('')
-const containerRef = ref<HTMLElement | null>(null)
-let viewer: LivePhotoViewer | null = null
+const fileInput = ref<HTMLInputElement | null>(null);
+const result = ref<ExtractResult | null>(null);
+const processing = ref(false);
+const error = ref('');
+const previewRef = ref<HTMLElement | null>(null);
+let viewer: LivePhotoViewer | null = null;
 
-const handleFileSelect = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  
-  if (!file) return
-  
-  // 清理之前的资源
-  if (extractResult.value) {
-    revokeUrls(extractResult.value.photoUrl, extractResult.value.videoUrl)
-  }
-  if (viewer) {
-    viewer.destroy()
-    viewer = null
-  }
-  
-  extractResult.value = null
-  error.value = ''
-  isProcessing.value = true
-  
+async function handleFile(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  if (result.value) revokeUrls(result.value.photoUrl, result.value.videoUrl);
+  if (viewer) { viewer.destroy(); viewer = null; }
+  result.value = null;
+  error.value = '';
+  processing.value = true;
   try {
-    const result = await extractFromLivePhoto(file)
-    
-    if (!result) {
-      error.value = '无法提取实况照片，请确保文件格式正确'
-      return
-    }
-    
-    extractResult.value = result
-    
-    // 等待 DOM 更新后再创建 LivePhotoViewer 实例
-    await nextTick()
-    
-    if (containerRef.value) {
+    const r = await extractFromLivePhoto(file);
+    if (!r) { error.value = '无法提取，请确保文件格式正确'; return; }
+    result.value = r;
+    await nextTick();
+    if (previewRef.value) {
       viewer = new LivePhotoViewer({
-        photoSrc: result.photoUrl,
-        videoSrc: result.videoUrl,
-        container: containerRef.value,
+        photoSrc: r.photoUrl,
+        videoSrc: r.videoUrl,
+        container: previewRef.value,
+        width: '100%',
         height: '100%',
-        onError: (err) => {
-          console.error('播放错误:', err)
-        }
-      })
+        borderRadius: 8,
+      });
     }
-  } catch (err) {
-    error.value = '处理文件时出错'
-    console.error(err)
-  } finally {
-    isProcessing.value = false
-  }
+  } catch { error.value = '处理出错'; }
+  finally { processing.value = false; }
 }
 
-const handleDownload = (type: 'photo' | 'video') => {
-  if (!extractResult.value) return
-  
-  const blob = type === 'photo' ? extractResult.value.photoBlob : extractResult.value.videoBlob
-  const ext = type === 'photo' ? 'jpg' : 'mp4'
-  downloadBlob(blob, `livephoto-${type}.${ext}`)
+function dl(type: 'photo' | 'video') {
+  if (!result.value) return;
+  downloadBlob(type === 'photo' ? result.value.photoBlob : result.value.videoBlob, `livephoto-${type}.${type === 'photo' ? 'jpg' : 'mp4'}`);
 }
 
-const triggerFileInput = () => {
-  fileInput.value?.click()
-}
+const code = `import { extractFromLivePhoto } from 'live-photo'
+
+const result = await extractFromLivePhoto(file)
+// result.photoBlob / result.videoBlob
+// result.photoUrl / result.videoUrl`;
 </script>
 
 <template>
-  <div class="extract-demo">
-    <div class="upload-section">
-      <input
-        ref="fileInput"
-        type="file"
-        accept="image/*"
-        @change="handleFileSelect"
-        style="display: none"
-      />
-      
-      <button @click="triggerFileInput" class="upload-btn" :disabled="isProcessing">
-        {{ isProcessing ? '处理中...' : '选择实况照片' }}
-      </button>
-      
-      <p class="hint">（目前测试支持的机型有荣耀，小米）实况照片（Live Photo）</p>
-    </div>
+  <section id="extract" class="sec">
+    <div class="container">
+      <h2 class="sec-title">实况提取</h2>
 
-    <div v-if="error" class="error-message">
-      {{ error }}
-    </div>
+      <div class="card">
+        <div class="pick">
+          <input ref="fileInput" type="file" accept="image/*" @change="handleFile" hidden />
+          <button class="btn btn-primary" :disabled="processing" @click="fileInput?.click()">
+            {{ processing ? '处理中…' : '选择实况照片' }}
+          </button>
+          <span class="hint">支持荣耀、小米等机型的 Live Photo 文件</span>
+          <p v-if="error" class="err">{{ error }}</p>
+        </div>
 
-    <div v-if="extractResult" class="result-section">
-      <div class="preview-container" ref="containerRef"></div>
-      
-      <div class="actions">
-        <button @click="handleDownload('photo')" class="action-btn">
-          下载图片
-        </button>
-        <button @click="handleDownload('video')" class="action-btn">
-          下载视频
-        </button>
+        <div v-if="result" class="result">
+          <div class="preview" ref="previewRef"></div>
+          <div class="dl-row">
+            <button class="btn btn-ghost" @click="dl('photo')">下载图片</button>
+            <button class="btn btn-ghost" @click="dl('video')">下载视频</button>
+          </div>
+        </div>
+
+        <CodeBlock :code="code" style="margin-top: 16px;" />
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.extract-demo {
-  max-width: 800px;
-  margin: 0 auto;
+.sec { padding: 80px 0; }
+.sec-title { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 28px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 20px;
 }
 
-.upload-section {
-  text-align: center;
-  padding: 40px 20px;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  background: #fafafa;
-}
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.hint { font-size: 13px; color: var(--text-dim); }
+.err { margin: 8px 0 0; font-size: 13px; color: #f87171; }
 
-.upload-btn {
-  padding: 12px 32px;
-  font-size: 16px;
-  background: #646cff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.upload-btn:hover:not(:disabled) {
-  background: #535bf2;
-}
-
-.upload-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.hint {
-  margin-top: 12px;
-  color: #666;
-  font-size: 14px;
-}
-
-.error-message {
-  margin-top: 20px;
-  padding: 12px;
-  background: #fee;
-  color: #c33;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.result-section {
-  margin-top: 30px;
-}
-
-.preview-container {
-  height: 400px;
-  border-radius: 8px;
+.result { margin-top: 16px; }
+.preview {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 4/5;
   overflow: hidden;
-  background: #000;
+  border-radius: 8px;
+  border: 1px solid var(--border);
 }
+.dl-row { display: flex; gap: 8px; margin-top: 12px; }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.action-btn {
-  padding: 10px 24px;
-  font-size: 14px;
-  background: #42b883;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.action-btn:hover {
-  background: #33a06f;
+@media (max-width: 768px) {
+  .sec { padding: 56px 0; }
 }
 </style>

@@ -12,7 +12,17 @@ export type {
   LivePhotoError,
   LivePhotoAPI,
   LivePhotoLabels,
+  LivePhotoPrefs,
+  PreferencesStore,
 } from './types';
+
+// Export preferences store helpers (cross-instance sync & persistence)
+export {
+  createMemoryStore,
+  getSharedStore,
+  createStorageStore,
+  resolvePreferencesStore,
+} from './core/PreferencesStore';
 
 export type { LoadAbortController } from './core/VideoLoader';
 export type { DebouncedFn } from './utils/debounce';

@@ -86,6 +86,10 @@ function buildOptions(el: HTMLElement): LivePhotoOptions | null {
   const width = parseDimension(d.width) ?? '100%';
   const height = parseDimension(d.height) ?? '100%';
 
+  // 同步分组：优先用 data-sync-group 指定的名字；
+  // 若只写了布尔型 data-sync 则归入默认分组 'default'。
+  const syncGroup = d.syncGroup ?? (parseBool(d.sync) ? 'default' : undefined);
+
   return {
     photoSrc,
     videoSrc,
@@ -106,6 +110,7 @@ function buildOptions(el: HTMLElement): LivePhotoOptions | null {
       borderRadius: parseDimension(d.borderRadius),
       locale: d.locale,
       storageKey: d.storageKey,
+      syncGroup,
       theme: parseTheme(d.theme),
       preload: parsePreload(d.preload),
     }),

@@ -9,6 +9,8 @@
   --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
   --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
   --live-photo-text-color: #fff;
+  --live-photo-badge-border: none;
+  --live-photo-badge-shadow: none;
   --live-photo-border-radius: 12px;
   --live-photo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --live-photo-progress-height: 3px;

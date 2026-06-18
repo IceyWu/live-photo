@@ -1,0 +1,19 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="live-photo logo">
+  <!-- Minimal monochrome Live badge -->
+  <g fill="#18181b">
+    <circle cx="120" cy="58" r="5"/>
+    <circle cx="151" cy="66.3" r="5"/>
+    <circle cx="173.7" cy="89" r="5"/>
+    <circle cx="182" cy="120" r="5"/>
+    <circle cx="173.7" cy="151" r="5"/>
+    <circle cx="151" cy="173.7" r="5"/>
+    <circle cx="120" cy="182" r="5"/>
+    <circle cx="89" cy="173.7" r="5"/>
+    <circle cx="66.3" cy="151" r="5"/>
+    <circle cx="58" cy="120" r="5"/>
+    <circle cx="66.3" cy="89" r="5"/>
+    <circle cx="89" cy="66.3" r="5"/>
+  </g>
+  <circle cx="120" cy="120" r="40" fill="none" stroke="#18181b" stroke-width="10"/>
+  <circle cx="120" cy="120" r="14" fill="#18181b"/>
+</svg>

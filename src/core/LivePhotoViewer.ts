@@ -13,8 +13,8 @@ import { debounce, type DebouncedFn } from '../utils/debounce';
 import { IS_MOBILE, createLivePhotoError } from '../utils/helpers';
 import { errorIcon } from './icons';
 import { resolveLabels } from './i18n';
-import type { LivePhotoLabels } from '../types';
-import { loadPrefs, savePrefs } from '../utils/storage';
+import type { LivePhotoLabels, LivePhotoPrefs, PreferencesStore } from '../types';
+import { createMemoryStore, resolvePreferencesStore } from './PreferencesStore';
 
 export class LivePhotoViewer implements LivePhotoAPI {
   private readonly stateManager: StateManager;
@@ -49,6 +49,19 @@ export class LivePhotoViewer implements LivePhotoAPI {
   private loadAbortController?: LoadAbortController;
   private destroyed: boolean = false;
 
+  /** 偏好存储（同步 / 持久化的统一来源）。实例始终观测它。*/
+  private readonly store: PreferencesStore;
+  private readonly storeUnsubscribe: () => void;
+  /**
+   * 唯一的偏好应用入口：把 store 的变更落到 state / video / UI。
+   * 用箭头函数保证引用稳定，便于订阅与取消订阅。
+   */
+  private readonly applyPrefs = (prefs: LivePhotoPrefs): void => {
+    if (this.destroyed) return;
+    if (prefs.autoplay !== undefined) this.applyAutoplay(prefs.autoplay);
+    if (prefs.muted !== undefined) this.applyMuted(prefs.muted);
+  };
+
   constructor(options: LivePhotoOptions) {
     validateOptions(options);
 
@@ -64,18 +77,21 @@ export class LivePhotoViewer implements LivePhotoAPI {
     };
 
     // 读取持久化偏好（优先级高于默认值，低于用户本次显式传入）
-    const prefs = options.storageKey ? loadPrefs(options.storageKey) : {};
-    const persistedAutoplay = prefs.autoplay !== undefined && options.autoplay === undefined
-      ? prefs.autoplay : undefined;
-    const persistedMuted = prefs.muted !== undefined && options.muted === undefined
-      ? prefs.muted : undefined;
+    const baseOptions: LivePhotoOptions = { ...defaults, ...options };
 
-    this.options = {
-      ...defaults,
-      ...options,
-      ...(persistedAutoplay !== undefined ? { autoplay: persistedAutoplay } : {}),
-      ...(persistedMuted !== undefined ? { muted: persistedMuted } : {}),
-    };
+    // 解析偏好存储：显式 store > 分组+持久化 > 分组 > 持久化；都没有则用实例私有内存 store。
+    this.store = resolvePreferencesStore({
+      preferencesStore: baseOptions.preferencesStore,
+      syncGroup: baseOptions.syncGroup,
+      storageKey: baseOptions.storageKey,
+    }) ?? createMemoryStore({ autoplay: baseOptions.autoplay, muted: baseOptions.muted });
+
+    // 采用 store 现有值（来自其它实例 / localStorage）覆盖本次默认值，保证视觉一致。
+    const current = this.store.get();
+    const autoplay = current.autoplay ?? baseOptions.autoplay ?? true;
+    const muted = current.muted ?? baseOptions.muted ?? true;
+
+    this.options = { ...baseOptions, autoplay, muted };
 
     this.labels = resolveLabels(this.options.locale, this.options.labels);
 
@@ -123,6 +139,9 @@ export class LivePhotoViewer implements LivePhotoAPI {
     this.assembleDOM();
     this.setupEventListeners();
     this.stateManager.subscribe(this.syncUI.bind(this));
+    this.storeUnsubscribe = this.store.subscribe(this.applyPrefs);
+    // 把解析后的初始值写回 store：首个实例为分组/持久层播种；后续实例为同值写入（脏检查后空操作）。
+    this.store.set({ autoplay: this.options.autoplay, muted: this.options.muted });
     this.initialize();
   }
 
@@ -347,14 +366,17 @@ export class LivePhotoViewer implements LivePhotoAPI {
 
   private handleToggleAutoplay(e: Event): void {
     e.stopPropagation();
-    const state = this.stateManager.getState();
-    const newAutoplay = !state.autoplay;
-    this.stateManager.setState({ autoplay: newAutoplay });
-    if (this.options.storageKey) {
-      savePrefs(this.options.storageKey, { autoplay: newAutoplay, muted: state.muted });
-    }
     this.closeDropMenu();
-    if (!newAutoplay && state.isPlaying) this.stop();
+    // 只写 store，应用与（可能的）同步/持久化由 applyPrefs 订阅统一处理。
+    this.store.set({ autoplay: !this.stateManager.getState().autoplay });
+  }
+
+  /** 应用 autoplay 变更到本地 state/UI（由 store 订阅驱动，不再写回 store）。*/
+  private applyAutoplay(autoplay: boolean): void {
+    const state = this.stateManager.getState();
+    if (autoplay === state.autoplay) return;
+    this.stateManager.setState({ autoplay });
+    if (!autoplay && state.isPlaying) this.stop();
   }
 
   private handleToggleMute(e: Event): void {
@@ -531,18 +553,20 @@ export class LivePhotoViewer implements LivePhotoAPI {
 
   public setMuted(muted: boolean): void {
     if (this.destroyed) return;
-    const state = this.stateManager.getState();
+    this.store.set({ muted });
+  }
+
+  /** 应用 muted 变更到本地 state/video/UI（由 store 订阅驱动，不再写回 store）。*/
+  private applyMuted(muted: boolean): void {
+    if (muted === this.stateManager.getState().muted) return;
     this.stateManager.setState({ muted });
     this.video.muted = muted;
-    if (this.options.storageKey) {
-      savePrefs(this.options.storageKey, { autoplay: state.autoplay, muted });
-    }
     this.options.onMutedChange?.(muted, this.video);
   }
 
   public toggleMute(): void {
     if (this.destroyed) return;
-    this.setMuted(!this.stateManager.getState().muted);
+    this.store.set({ muted: !this.stateManager.getState().muted });
   }
 
   public toggle(): void {
@@ -553,6 +577,7 @@ export class LivePhotoViewer implements LivePhotoAPI {
   public destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.storeUnsubscribe();
     if (this.badgeRestoreTimer) {
       clearTimeout(this.badgeRestoreTimer);
       this.badgeRestoreTimer = undefined;

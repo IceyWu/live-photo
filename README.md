@@ -62,6 +62,16 @@ const viewer = new LivePhotoViewer({
 
 → More examples: [Vanilla JS](./docs/vanilla.md) · [Vue 3](./docs/vue.md) · [React](./docs/react.md)
 
+**Declarative (CDN)** — elements with `data-live-photo` auto-initialize once the DOM is ready:
+
+```html
+<script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+<div data-live-photo data-photo-src="photo.jpg" data-video-src="video.mp4"
+     style="width: 320px; height: 320px"></div>
+```
+
+→ See [docs/auto-init.md](./docs/auto-init.md)
+
 ## ⚙️ Options
 
 | Option | Type | Default | Description |
@@ -84,7 +94,9 @@ const viewer = new LivePhotoViewer({
 | `staticBadgeIcon` | `boolean` | `false` | Disable slash on badge icon |
 | `locale` | `string` | `'zh-CN'` | UI language (`'zh-CN'` \| `'en'`) |
 | `labels` | `Partial<LivePhotoLabels>` | — | Override individual UI strings |
-| `storageKey` | `string` | — | localStorage key to persist autoplay/muted preferences |
+| `storageKey` | `string` | — | localStorage key; persists autoplay/muted and syncs them across same-origin tabs |
+| `syncGroup` | `string` | — | Share autoplay/muted live across instances with the same group name |
+| `preferencesStore` | `PreferencesStore` | — | Custom store for sharing/persisting autoplay/muted (takes precedence over the two above) |
 | `imageCustomization` | `ElementCustomization` | — | Custom styles/attributes for the `<img>` |
 | `videoCustomization` | `ElementCustomization` | — | Custom styles/attributes for the `<video>` |
 
@@ -142,6 +154,12 @@ interface LivePhotoState {
 }
 ```
 
+## 🔗 Preferences sync & persistence
+
+Share `autoplay`/`muted` across instances (`syncGroup`), persist them with cross-tab sync (`storageKey`), or plug in a custom `PreferencesStore`.
+
+→ See [docs/preferences.md](./docs/preferences.md)
+
 ## 📤 Extract Live Photo
 
 → See [docs/extract.md](./docs/extract.md)
@@ -161,6 +179,8 @@ interface LivePhotoState {
   --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
   --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
   --live-photo-text-color: #fff;
+  --live-photo-badge-border: none;
+  --live-photo-badge-shadow: none;
   --live-photo-border-radius: 12px;
   --live-photo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --live-photo-progress-height: 3px;

@@ -2,6 +2,8 @@
   --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
   --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
   --live-photo-text-color: #fff;
+  --live-photo-badge-border: none;
+  --live-photo-badge-shadow: none;
   --live-photo-border-radius: 12px;
   --live-photo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --live-photo-progress-height: 3px;
@@ -11,18 +13,20 @@
 }
 
 [data-theme="dark"] {
-  --live-photo-badge-bg: rgba(32, 32, 32, 0.7);
-  --live-photo-badge-hover-bg: rgba(32, 32, 32, 0.9);
-  --live-photo-dropdown-bg: rgba(32, 32, 32, 0.5);
-  --live-photo-dropdown-button-hover: rgba(32, 32, 32, 0.7);
+  --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
+  --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
+  --live-photo-dropdown-bg: rgba(64, 64, 64, 0.25);
+  --live-photo-dropdown-button-hover: rgba(64, 64, 64, 0.5);
 }
 
 [data-theme="light"] {
   --live-photo-badge-bg: rgba(255, 255, 255, 0.7);
-  --live-photo-badge-hover-bg: rgba(255, 255, 255, 0.9);
-  --live-photo-text-color: #000;
-  --live-photo-dropdown-bg: rgba(255, 255, 255, 0.5);
-  --live-photo-dropdown-button-hover: rgba(255, 255, 255, 0.7);
+  --live-photo-badge-hover-bg: rgba(255, 255, 255, 0.85);
+  --live-photo-text-color: #1a1a1a;
+  --live-photo-badge-border: 1px solid rgba(0, 0, 0, 0.1);
+  --live-photo-badge-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --live-photo-dropdown-bg: rgba(255, 255, 255, 0.75);
+  --live-photo-dropdown-button-hover: rgba(0, 0, 0, 0.06);
 }
 
 .live-photo-container {
@@ -73,6 +77,8 @@
   top: 16px;
   z-index: 10;
   background: var(--live-photo-badge-bg);
+  border: var(--live-photo-badge-border);
+  box-shadow: var(--live-photo-badge-shadow);
   border-radius: var(--live-photo-border-radius);
   color: var(--live-photo-text-color);
   cursor: pointer;
@@ -81,6 +87,8 @@
   box-sizing: border-box;
   transition: all var(--live-photo-transition);
   outline: none;
+  backdrop-filter: saturate(150%) blur(8px);
+  -webkit-backdrop-filter: saturate(150%) blur(8px);
 }
 
 .live-photo-badge:hover {
@@ -235,20 +243,22 @@
 /* auto 主题：跟随系统深色/浅色模式 */
 @media (prefers-color-scheme: dark) {
   [data-theme="auto"] {
-    --live-photo-badge-bg: rgba(32, 32, 32, 0.7);
-    --live-photo-badge-hover-bg: rgba(32, 32, 32, 0.9);
-    --live-photo-dropdown-bg: rgba(32, 32, 32, 0.5);
-    --live-photo-dropdown-button-hover: rgba(32, 32, 32, 0.7);
+    --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
+    --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
+    --live-photo-dropdown-bg: rgba(64, 64, 64, 0.25);
+    --live-photo-dropdown-button-hover: rgba(64, 64, 64, 0.5);
   }
 }
 
 @media (prefers-color-scheme: light) {
   [data-theme="auto"] {
-    --live-photo-badge-bg: rgba(255, 255, 255, 0.7);
-    --live-photo-badge-hover-bg: rgba(255, 255, 255, 0.9);
-    --live-photo-text-color: #000;
-    --live-photo-dropdown-bg: rgba(255, 255, 255, 0.5);
-    --live-photo-dropdown-button-hover: rgba(255, 255, 255, 0.7);
+    --live-photo-badge-bg: rgba(255, 255, 255, 0.55);
+    --live-photo-badge-hover-bg: rgba(255, 255, 255, 0.75);
+    --live-photo-text-color: #1a1a1a;
+    --live-photo-badge-border: 1px solid rgba(0, 0, 0, 0.08);
+    --live-photo-badge-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --live-photo-dropdown-bg: rgba(255, 255, 255, 0.6);
+    --live-photo-dropdown-button-hover: rgba(0, 0, 0, 0.05);
   }
 }
 /* 覆盖层：阻止视频元素拦截页面滚动 */

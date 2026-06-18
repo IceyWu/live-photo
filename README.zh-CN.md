@@ -62,6 +62,16 @@ const viewer = new LivePhotoViewer({
 
 → 更多示例：[原生 JS](./docs/vanilla.md) · [Vue 3](./docs/vue.md) · [React](./docs/react.md)
 
+**声明式（CDN）** —— 带 `data-live-photo` 的元素在 DOM 就绪后自动初始化：
+
+```html
+<script src="https://fastly.jsdelivr.net/npm/live-photo@latest"></script>
+<div data-live-photo data-photo-src="photo.jpg" data-video-src="video.mp4"
+     style="width: 320px; height: 320px"></div>
+```
+
+→ 详见 [docs/auto-init.md](./docs/auto-init.md)
+
 ## ⚙️ 配置项
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -84,7 +94,9 @@ const viewer = new LivePhotoViewer({
 | `staticBadgeIcon` | `boolean` | `false` | 禁用徽标斜杠图标 |
 | `locale` | `string` | `'zh-CN'` | UI 语言（`'zh-CN'` \| `'en'`） |
 | `labels` | `Partial<LivePhotoLabels>` | — | 覆盖单个 UI 文案 |
-| `storageKey` | `string` | — | localStorage key，用于持久化自动播放和静音偏好 |
+| `storageKey` | `string` | — | localStorage key，持久化自动播放和静音偏好，并在同源标签页间同步 |
+| `syncGroup` | `string` | — | 同名分组内的多个实例实时共享自动播放 / 静音状态 |
+| `preferencesStore` | `PreferencesStore` | — | 自定义偏好存储，用于共享 / 持久化（优先级高于上面两项） |
 | `imageCustomization` | `ElementCustomization` | — | 图片元素自定义样式 / 属性 |
 | `videoCustomization` | `ElementCustomization` | — | 视频元素自定义样式 / 属性 |
 
@@ -142,6 +154,12 @@ interface LivePhotoState {
 }
 ```
 
+## 🔗 偏好同步与持久化
+
+在多个实例间共享 `autoplay`/`muted`（`syncGroup`）、持久化并跨标签页同步（`storageKey`），或接入自定义 `PreferencesStore`。
+
+→ 详见 [docs/preferences.md](./docs/preferences.md)
+
 ## 📤 实况照片提取
 
 → 详见 [docs/extract.md](./docs/extract.md)
@@ -161,6 +179,8 @@ interface LivePhotoState {
   --live-photo-badge-bg: rgba(64, 64, 64, 0.5);
   --live-photo-badge-hover-bg: rgba(64, 64, 64, 0.7);
   --live-photo-text-color: #fff;
+  --live-photo-badge-border: none;
+  --live-photo-badge-shadow: none;
   --live-photo-border-radius: 12px;
   --live-photo-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --live-photo-progress-height: 3px;
