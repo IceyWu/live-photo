@@ -1,6 +1,9 @@
 // Export main class
 export { LivePhotoViewer } from './core/LivePhotoViewer';
 
+// Export declarative auto-initialization (scan [data-live-photo] elements)
+export { autoInit, AUTO_INIT_SELECTOR } from './core/autoInit';
+
 // Export types
 export type {
   LivePhotoOptions,

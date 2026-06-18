@@ -6,6 +6,8 @@
   "author": "Icey Wu <3128006406@qq.com>",
   "main": "dist/LivePhotoViewer.cjs.js",
   "module": "dist/LivePhotoViewer.esm.js",
+  "unpkg": "dist/LivePhotoViewer.js",
+  "jsdelivr": "dist/LivePhotoViewer.js",
   "types": "dist/index.d.ts",
   "packageManager": "pnpm@11.7.0",
   "engines": {
